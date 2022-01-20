@@ -24,6 +24,7 @@ export namespace Client {
 		youtubeClientOptions: Record<string, unknown>;
 		/** Use Node `https` module, set false to use `http` */
 		https: boolean;
+		proxy: string;
 	};
 }
 

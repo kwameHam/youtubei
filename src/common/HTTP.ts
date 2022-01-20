@@ -8,6 +8,8 @@ import qs from "querystring";
 import { BASE_URL, INNERTUBE_API_KEY, INNERTUBE_CLIENT_VERSION } from "../constants";
 import { YoutubeRawData } from "./types";
 import { Client } from "../classes/Client";
+import httpsProxyAgent from "https-proxy-agent";
+
 
 interface Options extends https.RequestOptions {
 	params: Record<string, any>;
@@ -26,17 +28,20 @@ export default class HTTP {
 	private _cookie: string;
 	private _defaultRequestOptions: Partial<https.RequestOptions>;
 	private _defaultClientOptions: Record<string, unknown>;
+	private _proxy: any;
 
 	constructor({
 		cookie,
 		requestOptions,
 		youtubeClientOptions,
 		https: useHttps,
+		proxy: proxy
 	}: Client.ClientOptions) {
 		this._cookie = cookie;
 		this._defaultRequestOptions = requestOptions;
 		this._defaultClientOptions = youtubeClientOptions;
 		this._httpClient = useHttps ? https : http;
+		this._proxy = proxy ? proxy : false
 	}
 
 	/** Send GET request to Youtube */
@@ -92,6 +97,10 @@ export default class HTTP {
 					...partialOptions.headers,
 				},
 			};
+			if (this._proxy) {
+                options.agent = new (httpsProxyAgent as any)(this._proxy)
+            }   
+            options.timeout = 120000
 
 			let body = options.data || "";
 			if (options.data) body = JSON.stringify(body);
@@ -121,12 +130,18 @@ export default class HTTP {
 							reject
 						);
 					})
-					.on("error", reject);
+					.on("error", function(err)  {
+                        console.log('error here11', err)
+                        reject
+                    });
 			});
-
-			request.on("error", reject);
-			request.write(body);
-			request.end();
+            request.on('error',function(err) {
+                console.log('response err: ', err);
+                reject
+              })
+            request.write(body);
+            request.end ( function()  {
+            })
 		});
 	}
 

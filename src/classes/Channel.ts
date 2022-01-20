@@ -51,15 +51,9 @@ export default class Channel extends ChannelCompact implements ChannelAttributes
 		this.name = title;
 		this.thumbnails = new Thumbnails().load(avatar.thumbnails);
 		this.videoCount = 0; // data not available
-		this.subscriberCount = subscriberCountText.simpleText;
+		this.subscriberCount = subscriberCountText && subscriberCountText.simpleText ? subscriberCountText.simpleText : 0;
 		this.videos = [];
 		this.playlists = [];
-
-		const { tvBanner, mobileBanner, banner } = data.header.c4TabbedHeaderRenderer;
-
-		this.banner = new Thumbnails().load(banner.thumbnails);
-		this.tvBanner = new Thumbnails().load(tvBanner.thumbnails);
-		this.mobileBanner = new Thumbnails().load(mobileBanner.thumbnails);
 
 		// shelves
 		const rawShelves =

@@ -77,25 +77,37 @@ export default class Video extends BaseVideo implements VideoAttributes {
 
 		for (let i = 0; i < count || count == 0; i++) {
 			if (!this.commentContinuation) break;
+			try {
 
-			const response = await this.client.http.post(`${I_END_POINT}/next`, {
-				data: { continuation: this.commentContinuation },
-			});
+				const response = await this.client.http.post(`${I_END_POINT}/next`, {
+					data: { continuation: this.commentContinuation },
+				});
 
-			const endpoints = response.data.onResponseReceivedEndpoints.pop();
+				const endpoints = response.data.onResponseReceivedEndpoints.pop();
 
-			const continuationItems = (
-				endpoints.reloadContinuationItemsCommand || endpoints.appendContinuationItemsAction
-			).continuationItems;
+				const continuationItems = (
+					endpoints.reloadContinuationItemsCommand || endpoints.appendContinuationItemsAction
+				).continuationItems;
 
-			this.commentContinuation = getContinuationFromItems(continuationItems);
+				this.commentContinuation = getContinuationFromItems(continuationItems);
 
-			const comments = mapFilter(continuationItems, "commentThreadRenderer");
-			newComments.push(
-				...comments.map((c: YoutubeRawData) =>
-					new Comment({ video: this, client: this.client }).load(c)
-				)
-			);
+				const comments = mapFilter(continuationItems, "commentThreadRenderer");
+				newComments.push(
+					...comments.map((c: YoutubeRawData) =>
+						new Comment({ video: this, client: this.client }).load(c)
+					)
+				);
+				console.log('action done. comms', newComments.length)
+
+			} catch (e) {
+				console.log('Req failed: Probably timeout')
+				if (newComments.length > 0) {
+					this.comments.push(...newComments)
+					return newComments
+				} else {
+					break
+				}
+			}
 		}
 		this.comments.push(...newComments);
 		return newComments;
