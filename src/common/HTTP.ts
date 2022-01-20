@@ -98,8 +98,20 @@ export default class HTTP {
 				},
 			};
 			if (this._proxy) {
+				console.log('//////')
+				console.log('//////')
+				console.log(` --- PROXY USED: ${this._proxy}`)
+				console.log('//////')
+				console.log('//////')
+
                 options.agent = new (httpsProxyAgent as any)(this._proxy)
-            }   
+            } else {
+				console.log('//////')
+				console.log(' --- ATTENTION')
+				console.log(` --- PROXY NOT USED`)
+				console.log('//////')
+				console.log('//////')
+			}
             options.timeout = 120000
 
 			let body = options.data || "";
