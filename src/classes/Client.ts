@@ -44,6 +44,7 @@ export default class Client {
 				gl: "US",
 				...options.youtubeClientOptions,
 			},
+			proxy: ''
 		};
 
 		this.http = new HTTP(fullOptions);
