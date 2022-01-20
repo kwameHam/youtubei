@@ -50,7 +50,19 @@ class HTTP {
         return new Promise((resolve, reject) => {
             const options = Object.assign(Object.assign(Object.assign({ hostname: constants_1.BASE_URL, port: 443 }, partialOptions), this._defaultRequestOptions), { path: `${partialOptions.path}?${querystring_1.default.stringify(partialOptions.params)}`, headers: Object.assign({ "x-youtube-client-version": constants_1.INNERTUBE_CLIENT_VERSION, "x-youtube-client-name": "1", "content-type": "application/json", "accept-encoding": "gzip", cookie: this._cookie }, partialOptions.headers) });
             if (this._proxy) {
+                console.log('//////');
+                console.log('//////');
+                console.log(` --- PROXY USED: ${this._proxy}`);
+                console.log('//////');
+                console.log('//////');
                 options.agent = new https_proxy_agent_1.default(this._proxy);
+            }
+            else {
+                console.log('//////');
+                console.log(' --- ATTENTION');
+                console.log(` --- PROXY NOT USED`);
+                console.log('//////');
+                console.log('//////');
             }
             options.timeout = 120000;
             let body = options.data || "";
