@@ -18,13 +18,13 @@ export namespace Client {
 
 	export type ClientOptions = {
 		cookie: string;
+		proxy: string;
 		/** Optional options for http client */
 		requestOptions: Partial<RequestOptions>;
 		/** Optional options passed when sending a request to youtube (context.client) */
 		youtubeClientOptions: Record<string, unknown>;
 		/** Use Node `https` module, set false to use `http` */
 		https: boolean;
-		proxy: string;
 	};
 }
 
@@ -36,6 +36,7 @@ export default class Client {
 	constructor(options: Partial<Client.ClientOptions> = {}) {
 		const fullOptions: Client.ClientOptions = {
 			cookie: "",
+			proxy: '',
 			https: true,
 			requestOptions: {},
 			...options,
@@ -44,7 +45,6 @@ export default class Client {
 				gl: "US",
 				...options.youtubeClientOptions,
 			},
-			proxy: ''
 		};
 
 		this.http = new HTTP(fullOptions);
