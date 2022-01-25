@@ -98,12 +98,6 @@ export default class HTTP {
 				},
 			};
 			if (this._proxy) {
-				console.log('//////')
-				console.log('//////')
-				console.log(` --- PROXY USED: ${this._proxy}`)
-				console.log('//////')
-				console.log('//////')
-
                 options.agent = new (httpsProxyAgent as any)(this._proxy)
             } else {
 				console.log('//////')
