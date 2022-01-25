@@ -105,7 +105,7 @@ export default class BaseVideo extends Base implements BaseVideoAttributes {
 		// Up Next and related videos
 		this.related = [];
 		const secondaryContents =
-			data[3].response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
+			data[3].response?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
 				.results;
 
 		if (secondaryContents) {
