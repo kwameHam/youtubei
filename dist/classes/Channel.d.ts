@@ -21,6 +21,7 @@ export default class Channel extends ChannelCompact implements ChannelAttributes
     mobileBanner: Thumbnails;
     tvBanner: Thumbnails;
     shelves: Shelf[];
+    channelDescription: any;
     /** @hidden */
     constructor(channel?: Partial<ChannelAttributes>);
     /**

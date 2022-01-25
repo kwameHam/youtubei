@@ -23,11 +23,13 @@ class Channel extends ChannelCompact_1.default {
      * @hidden
      */
     load(data) {
+        var _a, _b;
         const { channelId, title, avatar, subscriberCountText, } = data.header.c4TabbedHeaderRenderer;
         this.id = channelId;
         this.name = title;
         this.thumbnails = new Thumbnails_1.default().load(avatar.thumbnails);
         this.videoCount = 0; // data not available
+        this.channelDescription = ((_b = (_a = data.metadata) === null || _a === void 0 ? void 0 : _a.channelMetadataRenderer) === null || _b === void 0 ? void 0 : _b.description) || null;
         this.subscriberCount = subscriberCountText && subscriberCountText.simpleText ? subscriberCountText.simpleText : 0;
         this.videos = [];
         this.playlists = [];
