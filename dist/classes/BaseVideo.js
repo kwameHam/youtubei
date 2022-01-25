@@ -27,7 +27,7 @@ class BaseVideo extends _1.Base {
      * @hidden
      */
     load(data) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         const videoInfo = BaseVideo.parseRawData(data);
         // Basic information
         this.id = videoInfo.videoDetails.videoId;
@@ -55,10 +55,9 @@ class BaseVideo extends _1.Base {
             ((_c = videoInfo.description) === null || _c === void 0 ? void 0 : _c.runs.map((d) => d.text).join("")) || "";
         // Up Next and related videos
         this.related = [];
-        const secondaryContents = data[3].response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
-            .results;
+        const secondaryContents = (_g = (_f = (_e = (_d = data[3].response) === null || _d === void 0 ? void 0 : _d.contents) === null || _e === void 0 ? void 0 : _e.twoColumnWatchNextResults) === null || _f === void 0 ? void 0 : _f.secondaryResults) === null || _g === void 0 ? void 0 : _g.secondaryResults.results;
         if (secondaryContents) {
-            const upNext = ((_d = secondaryContents.find((s) => "compactAutoplayRenderer" in s)) === null || _d === void 0 ? void 0 : _d.compactAutoplayRenderer.contents[0]) || null;
+            const upNext = ((_h = secondaryContents.find((s) => "compactAutoplayRenderer" in s)) === null || _h === void 0 ? void 0 : _h.compactAutoplayRenderer.contents[0]) || null;
             this.upNext = upNext ? BaseVideo.parseCompactRenderer(upNext, this.client) : upNext;
             this.related.push(...BaseVideo.parseRelated(secondaryContents, this.client));
             // Related continuation
