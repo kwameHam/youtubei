@@ -24,6 +24,7 @@ export default class Channel extends ChannelCompact implements ChannelAttributes
 	mobileBanner!: Thumbnails;
 	tvBanner!: Thumbnails;
 	shelves!: Shelf[];
+	channelDescription: any;
 
 	/** @hidden */
 	constructor(channel: Partial<ChannelAttributes> = {}) {
@@ -51,6 +52,7 @@ export default class Channel extends ChannelCompact implements ChannelAttributes
 		this.name = title;
 		this.thumbnails = new Thumbnails().load(avatar.thumbnails);
 		this.videoCount = 0; // data not available
+		this.channelDescription = data.metadata?.channelMetadataRenderer?.description || null
 		this.subscriberCount = subscriberCountText && subscriberCountText.simpleText ? subscriberCountText.simpleText : 0;
 		this.videos = [];
 		this.playlists = [];
