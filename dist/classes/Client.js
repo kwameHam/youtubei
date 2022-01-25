@@ -15,7 +15,7 @@ const _1 = require(".");
 /** Youtube Client */
 class Client {
     constructor(options = {}) {
-        const fullOptions = Object.assign(Object.assign({ cookie: "", https: true, requestOptions: {} }, options), { youtubeClientOptions: Object.assign({ hl: "en", gl: "US" }, options.youtubeClientOptions), proxy: '' });
+        const fullOptions = Object.assign(Object.assign({ cookie: "", proxy: '', https: true, requestOptions: {} }, options), { youtubeClientOptions: Object.assign({ hl: "en", gl: "US" }, options.youtubeClientOptions) });
         this.http = new common_1.HTTP(fullOptions);
     }
     /**

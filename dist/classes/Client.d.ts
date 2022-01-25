@@ -13,13 +13,13 @@ export declare namespace Client {
     };
     type ClientOptions = {
         cookie: string;
+        proxy: string;
         /** Optional options for http client */
         requestOptions: Partial<RequestOptions>;
         /** Optional options passed when sending a request to youtube (context.client) */
         youtubeClientOptions: Record<string, unknown>;
         /** Use Node `https` module, set false to use `http` */
         https: boolean;
-        proxy: string;
     };
 }
 /** Youtube Client */
