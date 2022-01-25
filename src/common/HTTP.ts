@@ -35,7 +35,7 @@ export default class HTTP {
 		requestOptions,
 		youtubeClientOptions,
 		https: useHttps,
-		proxy: proxy
+		proxy
 	}: Client.ClientOptions) {
 		this._cookie = cookie;
 		this._defaultRequestOptions = requestOptions;

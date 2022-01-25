@@ -13,7 +13,7 @@ export default class HTTP {
     private _defaultRequestOptions;
     private _defaultClientOptions;
     private _proxy;
-    constructor({ cookie, requestOptions, youtubeClientOptions, https: useHttps, proxy: proxy }: Client.ClientOptions);
+    constructor({ cookie, requestOptions, youtubeClientOptions, https: useHttps, proxy }: Client.ClientOptions);
     /** Send GET request to Youtube */
     get(path: string, options: Partial<Options>): Promise<YoutubeRawData>;
     /** Send POST request to Youtube */
