@@ -22,6 +22,7 @@ export default class Channel extends ChannelCompact implements ChannelAttributes
     tvBanner: Thumbnails;
     shelves: Shelf[];
     channelDescription: any;
+    channelLink: any;
     /** @hidden */
     constructor(channel?: Partial<ChannelAttributes>);
     /**

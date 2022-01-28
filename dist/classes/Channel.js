@@ -23,7 +23,7 @@ class Channel extends ChannelCompact_1.default {
      * @hidden
      */
     load(data) {
-        var _a, _b;
+        var _a, _b, _c, _d;
         const { channelId, title, avatar, subscriberCountText, } = data.header.c4TabbedHeaderRenderer;
         this.id = channelId;
         this.name = title;
@@ -31,6 +31,7 @@ class Channel extends ChannelCompact_1.default {
         this.videoCount = 0; // data not available
         this.channelDescription = ((_b = (_a = data.metadata) === null || _a === void 0 ? void 0 : _a.channelMetadataRenderer) === null || _b === void 0 ? void 0 : _b.description) || null;
         this.subscriberCount = subscriberCountText && subscriberCountText.simpleText ? subscriberCountText.simpleText : 0;
+        this.channelLink = ((_d = (_c = data.microformat) === null || _c === void 0 ? void 0 : _c.microformatDataRenderer) === null || _d === void 0 ? void 0 : _d.urlCanonical) || null;
         this.videos = [];
         this.playlists = [];
         // shelves

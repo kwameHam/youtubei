@@ -18,6 +18,9 @@ export default class Video extends BaseVideo implements VideoAttributes {
     comments: Comment[];
     /** Current continuation token to load next comments  */
     commentContinuation?: string;
+    category: any;
+    publishDate: any;
+    isShorts: boolean | undefined;
     /** @hidden */
     constructor(video?: Partial<VideoAttributes>);
     /**

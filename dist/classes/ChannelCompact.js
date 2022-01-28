@@ -130,9 +130,9 @@ class ChannelCompact extends _1.Base {
     }
     /** Parse tab data from request, tab name is ignored if it's a continuation data */
     static parseTabData(name, data) {
-        var _a;
+        var _a, _b, _c, _d, _e;
         const index = name === "videos" ? 1 : 2;
-        return (((_a = data.contents) === null || _a === void 0 ? void 0 : _a.twoColumnBrowseResultsRenderer.tabs[index].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].gridRenderer.items) ||
+        return (((_e = (_d = (_c = (_b = (_a = data.contents) === null || _a === void 0 ? void 0 : _a.twoColumnBrowseResultsRenderer) === null || _b === void 0 ? void 0 : _b.tabs[index]) === null || _c === void 0 ? void 0 : _c.tabRenderer) === null || _d === void 0 ? void 0 : _d.content) === null || _e === void 0 ? void 0 : _e.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].gridRenderer.items) ||
             data.onResponseReceivedActions[0].appendContinuationItemsAction.continuationItems);
     }
 }
