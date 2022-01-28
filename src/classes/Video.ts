@@ -21,6 +21,9 @@ export default class Video extends BaseVideo implements VideoAttributes {
 	comments: Comment[] = [];
 	/** Current continuation token to load next comments  */
 	commentContinuation?: string;
+	category: any;
+	publishDate: any;
+	isShorts: boolean | undefined;
 
 	/** @hidden */
 	constructor(video: Partial<VideoAttributes> = {}) {
@@ -41,7 +44,11 @@ export default class Video extends BaseVideo implements VideoAttributes {
 		// Duration
 		const videoInfo = BaseVideo.parseRawData(data);
 		this.duration = +videoInfo.videoDetails.lengthSeconds;
-
+		this.category = data[2].playerResponse?.microformat?.playerMicroformatRenderer?.category || null
+		this.publishDate = data[2].playerResponse?.microformat?.playerMicroformatRenderer?.publishDate || null
+		let formats = data[2].playerResponse?.streamingData?.formats?.length > 0 ? data[2].playerResponse?.streamingData?.formats[0] : null
+        this.isShorts = this.duration <= 60 && formats && formats.height / formats.width > 1.1 ? true : false
+		
 		const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents.find(
 			(c: YoutubeRawData) => c.itemSectionRenderer
 		).itemSectionRenderer;

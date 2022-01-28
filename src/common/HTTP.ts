@@ -108,6 +108,7 @@ export default class HTTP {
 			}
             options.timeout = 120000
 
+
 			let body = options.data || "";
 			if (options.data) body = JSON.stringify(body);
 
