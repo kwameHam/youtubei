@@ -9,10 +9,8 @@ export interface BaseVideoAttributes extends BaseAttributes {
     uploadDate: string;
     viewCount: number | null;
     likeCount: number | null;
-    dislikeCount: number | null;
     isLiveContent: boolean;
     tags: string[];
-    upNext: VideoCompact | PlaylistCompact | null;
     related: (VideoCompact | PlaylistCompact)[];
     relatedContinuation?: string;
 }
@@ -32,14 +30,10 @@ export default class BaseVideo extends Base implements BaseVideoAttributes {
     viewCount: number | null;
     /** How many like does this video have, null if the like count hidden */
     likeCount: number | null;
-    /** How many dislike does this video have, null if the dislike count is hidden */
-    dislikeCount: number | null;
     /** Whether this video is a live content or not */
     isLiveContent: boolean;
     /** The tags of this video */
     tags: string[];
-    /** Next video / playlist recommended by Youtube */
-    upNext: VideoCompact | PlaylistCompact | null;
     /** Videos / playlists related to this video  */
     related: (VideoCompact | PlaylistCompact)[];
     /** Current continuation token to load next related content  */
@@ -52,6 +46,13 @@ export default class BaseVideo extends Base implements BaseVideoAttributes {
      * @hidden
      */
     load(data: YoutubeRawData): BaseVideo;
+    /**
+     * Video / playlist to play next after this video, alias to
+     * ```js
+     * video.related[0]
+     * ```
+     */
+    get upNext(): VideoCompact | PlaylistCompact;
     /** Load next related videos / playlists */
     nextRelated(count?: number): Promise<(VideoCompact | PlaylistCompact)[]>;
     /** @hidden */

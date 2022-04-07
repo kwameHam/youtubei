@@ -27,7 +27,7 @@ class BaseVideo extends _1.Base {
      * @hidden
      */
     load(data) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c;
         const videoInfo = BaseVideo.parseRawData(data);
         // Basic information
         this.id = videoInfo.videoDetails.videoId;
@@ -47,7 +47,6 @@ class BaseVideo extends _1.Base {
         // Like Count and Dislike Count
         const topLevelButtons = videoInfo.videoActions.menuRenderer.topLevelButtons;
         this.likeCount = common_1.stripToInt(BaseVideo.parseButtonRenderer(topLevelButtons[0]));
-        this.dislikeCount = common_1.stripToInt(BaseVideo.parseButtonRenderer(topLevelButtons[1]));
         // Tags and description
         this.tags =
             ((_b = (_a = videoInfo.superTitleLink) === null || _a === void 0 ? void 0 : _a.runs) === null || _b === void 0 ? void 0 : _b.map((r) => r.text.trim()).filter((t) => t)) || [];
@@ -55,19 +54,26 @@ class BaseVideo extends _1.Base {
             ((_c = videoInfo.description) === null || _c === void 0 ? void 0 : _c.runs.map((d) => d.text).join("")) || "";
         // Up Next and related videos
         this.related = [];
-        const secondaryContents = (_g = (_f = (_e = (_d = data[3].response) === null || _d === void 0 ? void 0 : _d.contents) === null || _e === void 0 ? void 0 : _e.twoColumnWatchNextResults) === null || _f === void 0 ? void 0 : _f.secondaryResults) === null || _g === void 0 ? void 0 : _g.secondaryResults.results;
+        const secondaryContents = data.response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
+            .results;
         if (secondaryContents) {
-            const upNext = ((_h = secondaryContents.find((s) => "compactAutoplayRenderer" in s)) === null || _h === void 0 ? void 0 : _h.compactAutoplayRenderer.contents[0]) || null;
-            this.upNext = upNext ? BaseVideo.parseCompactRenderer(upNext, this.client) : upNext;
             this.related.push(...BaseVideo.parseRelated(secondaryContents, this.client));
             // Related continuation
             this.relatedContinuation = common_1.getContinuationFromItems(secondaryContents);
         }
         else {
-            this.upNext = null;
             this.related = [];
         }
         return this;
+    }
+    /**
+     * Video / playlist to play next after this video, alias to
+     * ```js
+     * video.related[0]
+     * ```
+     */
+    get upNext() {
+        return this.related[0];
     }
     /** Load next related videos / playlists */
     nextRelated(count = 1) {
@@ -90,11 +96,11 @@ class BaseVideo extends _1.Base {
     }
     /** @hidden */
     static parseRawData(data) {
-        const contents = data[3].response.contents.twoColumnWatchNextResults.results.results.contents;
+        const contents = data.response.contents.twoColumnWatchNextResults.results.results.contents;
         const primaryInfo = contents.find((c) => "videoPrimaryInfoRenderer" in c)
             .videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
-        const videoDetails = data[2].playerResponse.videoDetails;
+        const videoDetails = data.playerResponse.videoDetails;
         return Object.assign(Object.assign(Object.assign({}, secondaryInfo), primaryInfo), { videoDetails });
     }
     static parseRelated(secondaryContents, client) {
