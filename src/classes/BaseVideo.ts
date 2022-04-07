@@ -21,7 +21,6 @@ export interface BaseVideoAttributes extends BaseAttributes {
 	likeCount: number | null;
 	isLiveContent: boolean;
 	tags: string[];
-	upNext: VideoCompact | PlaylistCompact | null;
 	related: (VideoCompact | PlaylistCompact)[];
 	relatedContinuation?: string;
 }
@@ -46,8 +45,6 @@ export default class BaseVideo extends Base implements BaseVideoAttributes {
 	isLiveContent!: boolean;
 	/** The tags of this video */
 	tags!: string[];
-	/** Next video / playlist recommended by Youtube */
-	upNext!: VideoCompact | PlaylistCompact | null;
 	/** Videos / playlists related to this video  */
 	related: (VideoCompact | PlaylistCompact)[] = [];
 	/** Current continuation token to load next related content  */
@@ -101,25 +98,28 @@ export default class BaseVideo extends Base implements BaseVideoAttributes {
 		// Up Next and related videos
 		this.related = [];
 		const secondaryContents =
-			data[3].response?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
+			data.response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
 				.results;
 
 		if (secondaryContents) {
-			const upNext =
-				secondaryContents.find((s: YoutubeRawData) => "compactAutoplayRenderer" in s)
-					?.compactAutoplayRenderer.contents[0] || null;
-
-			this.upNext = upNext ? BaseVideo.parseCompactRenderer(upNext, this.client)! : upNext;
 			this.related.push(...BaseVideo.parseRelated(secondaryContents, this.client));
-
 			// Related continuation
 			this.relatedContinuation = getContinuationFromItems(secondaryContents);
 		} else {
-			this.upNext = null;
 			this.related = [];
 		}
 
 		return this;
+	}
+
+	/**
+	 * Video / playlist to play next after this video, alias to
+	 * ```js
+	 * video.related[0]
+	 * ```
+	 */
+	get upNext(): VideoCompact | PlaylistCompact {
+		return this.related[0];
 	}
 
 	/** Load next related videos / playlists */
@@ -146,15 +146,14 @@ export default class BaseVideo extends Base implements BaseVideoAttributes {
 
 	/** @hidden */
 	static parseRawData(data: YoutubeRawData): YoutubeRawData {
-		const contents =
-			data[3].response.contents.twoColumnWatchNextResults.results.results.contents;
+		const contents = data.response.contents.twoColumnWatchNextResults.results.results.contents;
 
 		const primaryInfo = contents.find((c: YoutubeRawData) => "videoPrimaryInfoRenderer" in c)
 			.videoPrimaryInfoRenderer;
 		const secondaryInfo = contents.find(
 			(c: YoutubeRawData) => "videoSecondaryInfoRenderer" in c
 		).videoSecondaryInfoRenderer;
-		const videoDetails = data[2].playerResponse.videoDetails;
+		const videoDetails = data.playerResponse.videoDetails;
 		return { ...secondaryInfo, ...primaryInfo, videoDetails };
 	}
 
