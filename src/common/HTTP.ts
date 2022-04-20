@@ -126,6 +126,8 @@ export default class HTTP {
 				gunzip
 					.on("data", (data) => {
 						buffer.push(data.toString());
+						console.log('gunzip DATA: ', gunzip2)
+
 					})
 					.on("end", () => {
 						const data = JSON.parse(buffer.join("").toString());
@@ -138,10 +140,12 @@ export default class HTTP {
 							resolve,
 							reject
 						);
+						console.log('gunzip END: ', gunzip2)
+
 					})
 					.on("error", function(err)  {
                         console.log('error here11', err)
-						console.log('gunzip: ', gunzip2)
+					//	console.log('gunzip: ', gunzip2)
                         reject
                     });
 			});
