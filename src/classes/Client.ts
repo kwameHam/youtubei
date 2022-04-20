@@ -32,6 +32,7 @@ export namespace Client {
 export default class Client {
 	/** @hidden */
 	http: HTTP;
+	options: Client.ClientOptions;
 
 	constructor(options: Partial<Client.ClientOptions> = {}) {
 		const fullOptions: Client.ClientOptions = {
@@ -46,6 +47,7 @@ export default class Client {
 				...options.youtubeClientOptions,
 			},
 		};
+		this.options = fullOptions
 
 		this.http = new HTTP(fullOptions);
 	}
@@ -89,8 +91,9 @@ export default class Client {
 		playlistIdOrUrl: string
 	): Promise<T> {
 		const playlistId = getQueryParameter(playlistIdOrUrl, "list");
+		let newHTTP = new HTTP(this.options)
 		if (playlistId.startsWith("RD")) {
-			const response = await this.http.post(`${I_END_POINT}/next`, {
+			const response = await newHTTP.post(`${I_END_POINT}/next`, {
 				data: { playlistId },
 			});
 
@@ -100,7 +103,7 @@ export default class Client {
 			return new MixPlaylist({ client: this }).load(response.data) as T;
 		}
 
-		const response = await this.http.post(`${I_END_POINT}/browse`, {
+		const response = await newHTTP.post(`${I_END_POINT}/browse`, {
 			data: { browseId: `VL${playlistId}` },
 		});
 
@@ -113,8 +116,8 @@ export default class Client {
 	/** Get video information by video id or URL */
 	async getVideo<T extends Video | LiveVideo | undefined>(videoIdOrUrl: string): Promise<T> {
 		const videoId = getQueryParameter(videoIdOrUrl, "v");
-
-		const response = await this.http.get(`${WATCH_END_POINT}`, {
+		let newHTTP = new HTTP(this.options)
+		const response = await newHTTP.get(`${WATCH_END_POINT}`, {
 			params: { v: videoId, pbj: "1" },
 		});
 
@@ -126,7 +129,8 @@ export default class Client {
 
 	/** Get channel information by channel id+ */
 	async getChannel(channelId: string): Promise<Channel | undefined> {
-		const response = await this.http.post(`${I_END_POINT}/browse`, {
+		let newHTTP = new HTTP(this.options)
+		const response = await newHTTP.post(`${I_END_POINT}/browse`, {
 			data: { browseId: channelId },
 		});
 

@@ -26,6 +26,7 @@ export declare namespace Client {
 export default class Client {
     /** @hidden */
     http: HTTP;
+    options: Client.ClientOptions;
     constructor(options?: Partial<Client.ClientOptions>);
     /**
      * Searches for videos / playlists / channels

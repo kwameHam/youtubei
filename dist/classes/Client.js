@@ -16,6 +16,7 @@ const _1 = require(".");
 class Client {
     constructor(options = {}) {
         const fullOptions = Object.assign(Object.assign({ cookie: "", proxy: '', https: true, requestOptions: {} }, options), { youtubeClientOptions: Object.assign({ hl: "en", gl: "US" }, options.youtubeClientOptions) });
+        this.options = fullOptions;
         this.http = new common_1.HTTP(fullOptions);
     }
     /**
@@ -48,8 +49,9 @@ class Client {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             const playlistId = common_1.getQueryParameter(playlistIdOrUrl, "list");
+            let newHTTP = new common_1.HTTP(this.options);
             if (playlistId.startsWith("RD")) {
-                const response = yield this.http.post(`${constants_1.I_END_POINT}/next`, {
+                const response = yield newHTTP.post(`${constants_1.I_END_POINT}/next`, {
                     data: { playlistId },
                 });
                 if (response.data.error) {
@@ -57,7 +59,7 @@ class Client {
                 }
                 return new _1.MixPlaylist({ client: this }).load(response.data);
             }
-            const response = yield this.http.post(`${constants_1.I_END_POINT}/browse`, {
+            const response = yield newHTTP.post(`${constants_1.I_END_POINT}/browse`, {
                 data: { browseId: `VL${playlistId}` },
             });
             if (response.data.error || ((_c = (_b = (_a = response.data.alerts) === null || _a === void 0 ? void 0 : _a.shift()) === null || _b === void 0 ? void 0 : _b.alertRenderer) === null || _c === void 0 ? void 0 : _c.type) === "ERROR") {
@@ -70,7 +72,8 @@ class Client {
     getVideo(videoIdOrUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             const videoId = common_1.getQueryParameter(videoIdOrUrl, "v");
-            const response = yield this.http.get(`${constants_1.WATCH_END_POINT}`, {
+            let newHTTP = new common_1.HTTP(this.options);
+            const response = yield newHTTP.get(`${constants_1.WATCH_END_POINT}`, {
                 params: { v: videoId, pbj: "1" },
             });
             if (!response.data[3].response.contents)
@@ -84,7 +87,8 @@ class Client {
     getChannel(channelId) {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this.http.post(`${constants_1.I_END_POINT}/browse`, {
+            let newHTTP = new common_1.HTTP(this.options);
+            const response = yield newHTTP.post(`${constants_1.I_END_POINT}/browse`, {
                 data: { browseId: channelId },
             });
             if (response.data.error || ((_c = (_b = (_a = response.data.alerts) === null || _a === void 0 ? void 0 : _a.shift()) === null || _b === void 0 ? void 0 : _b.alertRenderer) === null || _c === void 0 ? void 0 : _c.type) === "ERROR") {
