@@ -48,7 +48,7 @@ class HTTP {
      */
     request(partialOptions) {
         return new Promise((resolve, reject) => {
-            const options = Object.assign(Object.assign(Object.assign({ hostname: constants_1.BASE_URL, port: 443 }, partialOptions), this._defaultRequestOptions), { path: `${partialOptions.path}?${querystring_1.default.stringify(partialOptions.params)}`, headers: Object.assign({ "x-youtube-client-version": constants_1.INNERTUBE_CLIENT_VERSION, "x-youtube-client-name": "1", "content-type": "application/json", "accept-encoding": "gzip", cookie: this._cookie }, partialOptions.headers) });
+            const options = Object.assign(Object.assign(Object.assign({ hostname: constants_1.BASE_URL, port: 443 }, partialOptions), this._defaultRequestOptions), { path: `${partialOptions.path}?${querystring_1.default.stringify(partialOptions.params)}`, headers: Object.assign({ "x-youtube-client-version": constants_1.INNERTUBE_CLIENT_VERSION, "x-youtube-client-name": "1", "content-type": "application/json", "accept-encoding": "gzip,deflate", cookie: this._cookie }, partialOptions.headers) });
             if (this._proxy) {
                 options.agent = new https_proxy_agent_1.default(this._proxy);
             }
@@ -68,6 +68,7 @@ class HTTP {
                 if ((_a = res.headers["set-cookie"]) === null || _a === void 0 ? void 0 : _a.length)
                     this._cookie = `${this._cookie} ${(_b = res.headers["set-cookie"]) === null || _b === void 0 ? void 0 : _b.map((c) => c.split(";").shift()).join(";")}`;
                 const gunzip = zlib_1.default.createGunzip();
+                const gunzip2 = zlib_1.default.createGunzip();
                 res.pipe(gunzip);
                 const buffer = [];
                 gunzip
@@ -84,6 +85,7 @@ class HTTP {
                 })
                     .on("error", function (err) {
                     console.log('error here11', err);
+                    console.log('gunzip: ', gunzip2);
                     reject;
                 });
             });

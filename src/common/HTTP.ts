@@ -92,7 +92,7 @@ export default class HTTP {
 					"x-youtube-client-version": INNERTUBE_CLIENT_VERSION,
 					"x-youtube-client-name": "1",
 					"content-type": "application/json",
-					"accept-encoding": "gzip",
+					"accept-encoding": "gzip,deflate",
 					cookie: this._cookie,
 					...partialOptions.headers,
 				},
@@ -118,7 +118,9 @@ export default class HTTP {
 						?.map((c) => c.split(";").shift())
 						.join(";")}`;
 
+				
 				const gunzip = zlib.createGunzip();
+				const gunzip2 = zlib.createGunzip()
 				res.pipe(gunzip);
 				const buffer: string[] = [];
 				gunzip
@@ -139,6 +141,7 @@ export default class HTTP {
 					})
 					.on("error", function(err)  {
                         console.log('error here11', err)
+						console.log('gunzip: ', gunzip2)
                         reject
                     });
 			});
