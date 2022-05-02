@@ -40,7 +40,7 @@ class Video extends _1.BaseVideo {
         this.category = ((_c = (_b = (_a = data[3].playerResponse) === null || _a === void 0 ? void 0 : _a.microformat) === null || _b === void 0 ? void 0 : _b.playerMicroformatRenderer) === null || _c === void 0 ? void 0 : _c.category) || null;
         this.publishDate = ((_f = (_e = (_d = data[3].playerResponse) === null || _d === void 0 ? void 0 : _d.microformat) === null || _e === void 0 ? void 0 : _e.playerMicroformatRenderer) === null || _f === void 0 ? void 0 : _f.publishDate) || null;
         let formats = ((_j = (_h = (_g = data[3].playerResponse) === null || _g === void 0 ? void 0 : _g.streamingData) === null || _h === void 0 ? void 0 : _h.formats) === null || _j === void 0 ? void 0 : _j.length) > 0 ? (_l = (_k = data[3].playerResponse) === null || _k === void 0 ? void 0 : _k.streamingData) === null || _l === void 0 ? void 0 : _l.formats[0] : null;
-        console.log('data[3].playerResponse?.streamingData?', data[3].playerResponse);
+        console.log('data[3]', data[3]);
         this.isShorts = this.duration <= 60 && formats && formats.height / formats.width > 1.1 ? true : false;
         const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents.find((c) => c.itemSectionRenderer).itemSectionRenderer;
         this.commentContinuation = common_1.getContinuationFromItems(itemSectionRenderer.contents);

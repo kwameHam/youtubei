@@ -47,7 +47,7 @@ export default class Video extends BaseVideo implements VideoAttributes {
 		this.category = data[3].playerResponse?.microformat?.playerMicroformatRenderer?.category || null
 		this.publishDate = data[3].playerResponse?.microformat?.playerMicroformatRenderer?.publishDate || null
 		let formats = data[3].playerResponse?.streamingData?.formats?.length > 0 ? data[3].playerResponse?.streamingData?.formats[0] : null
-		console.log('data[3].playerResponse?.streamingData?', data[3].playerResponse)
+		console.log('data[3]', data[3])
         this.isShorts = this.duration <= 60 && formats && formats.height / formats.width > 1.1 ? true : false
 		
 		const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents.find(
