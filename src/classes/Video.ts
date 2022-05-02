@@ -41,7 +41,7 @@ export default class Video extends BaseVideo implements VideoAttributes {
 		super.load(data);
 
 		this.comments = [];
-		let countData = data[3].response?.contents?.twoColumnWatchNextResults?.results?.results?.contents[2].itemSectionRenderer?.contents[0].commentsEntryPointHeaderRenderer?.commentCount?.simpleTextdata[3].response?.contents?.twoColumnWatchNextResults?.results?.results?.contents[2].itemSectionRenderer?.contents[0].commentsEntryPointHeaderRenderer?.commentCount?.simpleText || null
+		let countData = data[3].response?.contents?.twoColumnWatchNextResults?.results?.results?.contents[2].itemSectionRenderer?.contents[0].commentsEntryPointHeaderRenderer?.commentCount?.simpleText || null
 		this.commentCount = countData ? parseInt(countData) : null
 		// Durationa
 		const videoInfo = BaseVideo.parseRawData(data);
