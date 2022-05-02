@@ -21,6 +21,7 @@ export default class Video extends BaseVideo implements VideoAttributes {
     category: any;
     publishDate: any;
     isShorts: boolean | undefined;
+    commentCount: any;
     /** @hidden */
     constructor(video?: Partial<VideoAttributes>);
     /**

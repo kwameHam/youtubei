@@ -71,7 +71,6 @@ export default class VideoCompact extends Base implements VideoCompactAttributes
 			detailedMetadataSnippets?.[0].snippetText.runs
 				.map((r: YoutubeRawData) => r.text)
 				.join("") || "";
-
 		this.duration =
 			getDuration(
 				lengthText?.simpleText ||
