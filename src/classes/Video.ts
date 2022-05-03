@@ -52,7 +52,7 @@ export default class Video extends BaseVideo implements VideoAttributes {
         this.isShorts = this.duration <= 60 && formats && formats.height / formats.width > 1.1 ? true : false
 		
 		const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents.find(
-			(c: YoutubeRawData) => c.itemSectionRenderer
+			(c: YoutubeRawData) => c.itemSectionRenderer && c.itemSectionRenderer.sectionIdentifier === 'comment-item-section'
 		).itemSectionRenderer;
 
 		this.commentContinuation = getContinuationFromItems(itemSectionRenderer.contents);

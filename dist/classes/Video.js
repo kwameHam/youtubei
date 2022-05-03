@@ -43,7 +43,7 @@ class Video extends _1.BaseVideo {
         this.publishDate = ((_p = (_o = (_m = data[2].playerResponse) === null || _m === void 0 ? void 0 : _m.microformat) === null || _o === void 0 ? void 0 : _o.playerMicroformatRenderer) === null || _p === void 0 ? void 0 : _p.publishDate) || null;
         let formats = ((_s = (_r = (_q = data[2].playerResponse) === null || _q === void 0 ? void 0 : _q.streamingData) === null || _r === void 0 ? void 0 : _r.formats) === null || _s === void 0 ? void 0 : _s.length) > 0 ? (_u = (_t = data[2].playerResponse) === null || _t === void 0 ? void 0 : _t.streamingData) === null || _u === void 0 ? void 0 : _u.formats[0] : null;
         this.isShorts = this.duration <= 60 && formats && formats.height / formats.width > 1.1 ? true : false;
-        const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents.find((c) => c.itemSectionRenderer).itemSectionRenderer;
+        const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents.find((c) => c.itemSectionRenderer && c.itemSectionRenderer.sectionIdentifier === 'comment-item-section').itemSectionRenderer;
         this.commentContinuation = common_1.getContinuationFromItems(itemSectionRenderer.contents);
         return this;
     }
