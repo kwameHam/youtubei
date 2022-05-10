@@ -34,8 +34,13 @@ class VideoCompact extends _1.Base {
         this.title = title.simpleText || ((_a = title.runs[0]) === null || _a === void 0 ? void 0 : _a.text);
         this.thumbnails = new _1.Thumbnails().load(thumbnail.thumbnails);
         this.uploadDate = publishedTimeText === null || publishedTimeText === void 0 ? void 0 : publishedTimeText.simpleText;
-        this.description =
-            (detailedMetadataSnippets === null || detailedMetadataSnippets === void 0 ? void 0 : detailedMetadataSnippets[0].snippetText.runs.map((r) => r.text).join("")) || "";
+        try {
+            this.description =
+                (detailedMetadataSnippets === null || detailedMetadataSnippets === void 0 ? void 0 : detailedMetadataSnippets[0].snippetText.runs.map((r) => r.text).join("")) || "";
+        }
+        catch (e) {
+            console.log('api, description err:', JSON.stringify(detailedMetadataSnippets));
+        }
         this.duration =
             common_1.getDuration((lengthText === null || lengthText === void 0 ? void 0 : lengthText.simpleText) || ((_b = thumbnailOverlays === null || thumbnailOverlays === void 0 ? void 0 : thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer) === null || _b === void 0 ? void 0 : _b.text.simpleText) ||
                 "") || null;
