@@ -54,8 +54,9 @@ class BaseVideo extends _1.Base {
             ((_c = videoInfo.description) === null || _c === void 0 ? void 0 : _c.runs.map((d) => d.text).join("")) || "";
         // Up Next and related videos
         this.related = [];
-        const secondaryContents = data[3].response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
-            .results;
+        const secondaryContents = null;
+        // data[3].response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
+        // 	.results;
         if (secondaryContents) {
             this.related.push(...BaseVideo.parseRelated(secondaryContents, this.client));
             // Related continuation
