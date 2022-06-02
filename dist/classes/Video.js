@@ -34,8 +34,16 @@ class Video extends _1.BaseVideo {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
         super.load(data);
         this.comments = [];
-        let countData = ((_h = (_g = (_f = (_e = (_d = (_c = (_b = (_a = data[3].response) === null || _a === void 0 ? void 0 : _a.contents) === null || _b === void 0 ? void 0 : _b.twoColumnWatchNextResults) === null || _c === void 0 ? void 0 : _c.results) === null || _d === void 0 ? void 0 : _d.results) === null || _e === void 0 ? void 0 : _e.contents[2].itemSectionRenderer) === null || _f === void 0 ? void 0 : _f.contents[0].commentsEntryPointHeaderRenderer) === null || _g === void 0 ? void 0 : _g.commentCount) === null || _h === void 0 ? void 0 : _h.simpleText) || null;
-        this.commentCount = countData ? parseInt(countData) : null;
+        let countData;
+        countData = ((_h = (_g = (_f = (_e = (_d = (_c = (_b = (_a = data[3].response) === null || _a === void 0 ? void 0 : _a.contents) === null || _b === void 0 ? void 0 : _b.twoColumnWatchNextResults) === null || _c === void 0 ? void 0 : _c.results) === null || _d === void 0 ? void 0 : _d.results) === null || _e === void 0 ? void 0 : _e.contents[2].itemSectionRenderer) === null || _f === void 0 ? void 0 : _f.contents[0].commentsEntryPointHeaderRenderer) === null || _g === void 0 ? void 0 : _g.commentCount) === null || _h === void 0 ? void 0 : _h.simpleText) || null;
+        if (countData && countData.includes('K')) {
+            countData = parseFloat(countData.replace(',', '.').replace('K', '')) * 1000;
+            countData = parseInt(countData);
+        }
+        else {
+            countData = countData ? parseInt(countData) : null;
+        }
+        this.commentCount = countData;
         // Durationa
         const videoInfo = _1.BaseVideo.parseRawData(data);
         this.duration = +videoInfo.videoDetails.lengthSeconds;

@@ -39,10 +39,16 @@ export default class Video extends BaseVideo implements VideoAttributes {
 	 */
 	load(data: YoutubeRawData): Video {
 		super.load(data);
-
 		this.comments = [];
-		let countData = data[3].response?.contents?.twoColumnWatchNextResults?.results?.results?.contents[2].itemSectionRenderer?.contents[0].commentsEntryPointHeaderRenderer?.commentCount?.simpleText || null
-		this.commentCount = countData ? parseInt(countData) : null
+		let countData: any
+		countData = data[3].response?.contents?.twoColumnWatchNextResults?.results?.results?.contents[2].itemSectionRenderer?.contents[0].commentsEntryPointHeaderRenderer?.commentCount?.simpleText || null
+		if (countData && countData.includes('K')) {
+            countData = parseFloat(countData.replace(',', '.').replace('K', '')) * 1000
+            countData = parseInt(countData)
+        } else {
+            countData = countData ? parseInt(countData) : null
+        }
+        this.commentCount = countData
 		// Durationa
 		const videoInfo = BaseVideo.parseRawData(data);
 		this.duration = +videoInfo.videoDetails.lengthSeconds;
