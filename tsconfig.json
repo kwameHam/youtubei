@@ -1,0 +1,9 @@
+{
+	"extends": "./typescript/tsconfig.base.json",
+	"compilerOptions": {
+		"target": "ES2015",
+		"types": ["vitest/globals"],
+		"resolveJsonModule": true
+	},
+	"include": ["./tests", "./@types/*.d.ts", "./src/**/*.ts"]
+}
