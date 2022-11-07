@@ -115,3 +115,4 @@ dist
 .pnp.*
 
 .temp
+.idea/
