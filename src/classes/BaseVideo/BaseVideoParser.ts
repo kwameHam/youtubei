@@ -54,6 +54,8 @@ export class BaseVideoParser {
 			target.related.continuation = getContinuationFromItems(secondaryContents);
 		}
 
+		target.isShorts = (parseInt(videoInfo.videoDetails.lengthSeconds) <= 61  && videoInfo.formats && videoInfo.formats.height / videoInfo.formats.width > 1.1);
+
 		return target;
 	}
 
@@ -81,7 +83,8 @@ export class BaseVideoParser {
 			(c: YoutubeRawData) => "videoSecondaryInfoRenderer" in c
 		).videoSecondaryInfoRenderer;
 		const videoDetails = data[2].playerResponse.videoDetails;
-		return { ...secondaryInfo, ...primaryInfo, videoDetails };
+		const formats = data[2].playerResponse?.streamingData?.formats[0];
+		return { ...secondaryInfo, ...primaryInfo, videoDetails, formats };
 	}
 
 	private static parseCompactRenderer(
