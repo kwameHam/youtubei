@@ -22,9 +22,8 @@ class SearchResultParser {
         };
     }
     static parseSearchResult(sectionListContents, client) {
-        const rawContents = sectionListContents
-            .filter((c) => "itemSectionRenderer" in c)
-            .at(-1).itemSectionRenderer.contents;
+        const item = sectionListContents.filter((c) => "itemSectionRenderer" in c);
+        const rawContents = item[item.length - 1].itemSectionRenderer.contents;
         const contents = [];
         for (const c of rawContents) {
             if ("playlistRenderer" in c)

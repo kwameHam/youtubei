@@ -16,13 +16,13 @@ class VideoParser {
         return target;
     }
     static parseComments(data, video) {
-        const endpoints = data.onResponseReceivedEndpoints.at(-1);
+        const endpoints = data.onResponseReceivedEndpoints[data.onResponseReceivedEndpoints.length - 1];
         const continuationItems = (endpoints.reloadContinuationItemsCommand || endpoints.appendContinuationItemsAction).continuationItems;
         const comments = common_1.mapFilter(continuationItems, "commentThreadRenderer");
         return comments.map((c) => new Comment_1.Comment({ video, client: video.client }).load(c));
     }
     static parseCommentContinuation(data) {
-        const endpoints = data.onResponseReceivedEndpoints.at(-1);
+        const endpoints = data.onResponseReceivedEndpoints[data.onResponseReceivedEndpoints.length - 1];
         const continuationItems = (endpoints.reloadContinuationItemsCommand || endpoints.appendContinuationItemsAction).continuationItems;
         return common_1.getContinuationFromItems(continuationItems);
     }
