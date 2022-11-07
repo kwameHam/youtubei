@@ -25,6 +25,7 @@ export const getContinuationFromItems = (
 	items: YoutubeRawData,
 	accessors: string[] = ["continuationEndpoint"]
 ): string | undefined => {
+	if(!items)return;
 	const continuation = items[items.length - 1];
 	const renderer = continuation?.continuationItemRenderer;
 	if (!renderer) return;
