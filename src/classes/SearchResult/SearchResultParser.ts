@@ -36,9 +36,8 @@ export class SearchResultParser {
 		sectionListContents: YoutubeRawData,
 		client: Client
 	): SearchResultItem[] {
-		const rawContents = sectionListContents
-			.filter((c: Record<string, unknown>) => "itemSectionRenderer" in c)
-			.at(-1).itemSectionRenderer.contents;
+		const item = sectionListContents.filter((c: Record<string, unknown>) => "itemSectionRenderer" in c)
+		const rawContents = item[item.length -1].itemSectionRenderer.contents;
 
 		const contents: SearchResultItem[] = [];
 
