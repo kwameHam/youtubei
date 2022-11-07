@@ -41,6 +41,7 @@ class BaseVideoParser {
             target.related.items = BaseVideoParser.parseRelatedFromSecondaryContent(secondaryContents, target.client);
             target.related.continuation = common_1.getContinuationFromItems(secondaryContents);
         }
+        target.isShorts = (parseInt(videoInfo.videoDetails.lengthSeconds) <= 61 && videoInfo.formats && videoInfo.formats.height / videoInfo.formats.width > 1.1);
         return target;
     }
     static parseRelated(data, client) {
@@ -52,12 +53,14 @@ class BaseVideoParser {
         return common_1.getContinuationFromItems(secondaryContents);
     }
     static parseRawData(data) {
+        var _a, _b;
         const contents = data[3].response.contents.twoColumnWatchNextResults.results.results.contents;
         const primaryInfo = contents.find((c) => "videoPrimaryInfoRenderer" in c)
             .videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
         const videoDetails = data[2].playerResponse.videoDetails;
-        return Object.assign(Object.assign(Object.assign({}, secondaryInfo), primaryInfo), { videoDetails });
+        const formats = (_b = (_a = data[2].playerResponse) === null || _a === void 0 ? void 0 : _a.streamingData) === null || _b === void 0 ? void 0 : _b.formats[0];
+        return Object.assign(Object.assign(Object.assign({}, secondaryInfo), primaryInfo), { videoDetails, formats });
     }
     static parseCompactRenderer(data, client) {
         if ("compactVideoRenderer" in data) {

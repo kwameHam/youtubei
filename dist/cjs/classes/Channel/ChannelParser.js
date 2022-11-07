@@ -7,12 +7,14 @@ const Thumbnails_1 = require("../Thumbnails");
 const VideoCompact_1 = require("../VideoCompact");
 class ChannelParser {
     static loadChannel(target, data) {
+        var _a;
         const { channelId, title, avatar, subscriberCountText, } = data.header.c4TabbedHeaderRenderer;
         target.id = channelId;
         target.name = title;
         target.thumbnails = new Thumbnails_1.Thumbnails().load(avatar.thumbnails);
         target.videoCount = 0; // data not available
         target.subscriberCount = subscriberCountText === null || subscriberCountText === void 0 ? void 0 : subscriberCountText.simpleText;
+        target.description = (_a = data === null || data === void 0 ? void 0 : data.metadata) === null || _a === void 0 ? void 0 : _a.channelMetadataRenderer.description;
         const { tvBanner, mobileBanner, banner } = data.header.c4TabbedHeaderRenderer;
         target.banner = new Thumbnails_1.Thumbnails().load((banner === null || banner === void 0 ? void 0 : banner.thumbnails) || []);
         target.tvBanner = new Thumbnails_1.Thumbnails().load((tvBanner === null || tvBanner === void 0 ? void 0 : tvBanner.thumbnails) || []);
