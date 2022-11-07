@@ -19,6 +19,7 @@ export interface BaseVideoProperties extends BaseProperties {
 	likeCount?: number | null;
 	isLiveContent?: boolean;
 	tags?: string[];
+	isShorts?: boolean;
 }
 
 /** Represents a Video  */
@@ -44,6 +45,7 @@ export class BaseVideo extends Base implements BaseVideoProperties {
 	tags!: string[];
 	/** Continuable of videos / playlists related to this video  */
 	related: VideoRelated;
+	isShorts!: boolean;
 
 	/** @hidden */
 	constructor(attr: BaseVideoProperties) {
