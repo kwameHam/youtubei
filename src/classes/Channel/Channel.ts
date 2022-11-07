@@ -17,6 +17,7 @@ interface ChannelProperties extends BaseChannelProperties {
 	tvBanner?: Thumbnails;
 	mobileBanner?: Thumbnails;
 	shelves?: Shelf[];
+	description?: string;
 }
 
 /**  Represents a Youtube Channel */
@@ -25,6 +26,7 @@ export class Channel extends BaseChannel implements ChannelProperties {
 	mobileBanner!: Thumbnails;
 	tvBanner!: Thumbnails;
 	shelves: Shelf[] = [];
+	description!: string;
 
 	/** @hidden */
 	constructor(attr: ChannelProperties) {
