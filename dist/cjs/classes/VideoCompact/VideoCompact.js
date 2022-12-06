@@ -23,6 +23,11 @@ class VideoCompact extends Base_1.Base {
     get isPrivateOrDeleted() {
         return !this.duration;
     }
+    getTranscript() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.client.getVideoTranscript(this.id);
+        });
+    }
     /**
      * Load this instance with raw data from Youtube
      *
