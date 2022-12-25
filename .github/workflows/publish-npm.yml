@@ -17,10 +17,6 @@ jobs:
                   node-version: "16.x"
                   registry-url: "https://registry.npmjs.org"
 
-            - name: Check Version Bump
-              id: check
-              uses: EndBug/version-check@v1.1.1
-
             - uses: pnpm/action-setup@v2.0.1
               name: Install pnpm
               id: pnpm-install
