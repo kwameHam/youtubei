@@ -4,6 +4,7 @@ import { PlaylistCompact } from "../PlaylistCompact";
 import { Thumbnails } from "../Thumbnails";
 import { VideoCompact } from "../VideoCompact";
 import { Channel, Shelf } from "./Channel";
+import {ShortCompact} from "../ShortCompact";
 
 export class ChannelParser {
 	static loadChannel(target: Channel, data: YoutubeRawData): Channel {
@@ -39,29 +40,42 @@ export class ChannelParser {
 				.sectionListRenderer.contents;
 
 		for (const rawShelf of rawShelves) {
-			const shelfRenderer = rawShelf.itemSectionRenderer.contents[0].shelfRenderer;
+			const shelfRenderer = rawShelf.itemSectionRenderer.contents[0].shelfRenderer || rawShelf.itemSectionRenderer.contents[0].reelShelfRenderer;
+			const isShortShelf : boolean = (rawShelf.itemSectionRenderer.contents[0].reelShelfRenderer); 
 			if (!shelfRenderer) continue;
 
-			const { title, content, subtitle } = shelfRenderer;
-			if (!content.horizontalListRenderer) continue;
+			const { title,  subtitle } = shelfRenderer;
+
+			let renderer = isShortShelf ? shelfRenderer : shelfRenderer.content?.horizontalListRenderer;
+
+			if (!renderer) continue;
 
 			const items:
 				| BaseChannel[]
 				| VideoCompact[]
-				| PlaylistCompact[] = content.horizontalListRenderer.items
+				| ShortCompact[]
+				| PlaylistCompact[] = renderer.items
 				.map((i: YoutubeRawData) => {
-					if (i.gridVideoRenderer)
-						return new VideoCompact({ client: target.client }).load(
-							i.gridVideoRenderer
-						);
-					if (i.gridPlaylistRenderer)
-						return new PlaylistCompact({ client: target.client }).load(
-							i.gridPlaylistRenderer
-						);
-					if (i.gridChannelRenderer)
-						return new BaseChannel({ client: target.client }).load(
-							i.gridChannelRenderer
-						);
+					if(isShortShelf) {
+						if (i.reelItemRenderer) {
+							return new ShortCompact({client: target.client}).load(
+								i.reelItemRenderer
+							);
+						}
+					}else{
+						if (i.gridVideoRenderer)
+							return new VideoCompact({ client: target.client }).load(
+								i.gridVideoRenderer
+							);
+						if (i.gridPlaylistRenderer)
+							return new PlaylistCompact({ client: target.client }).load(
+								i.gridPlaylistRenderer
+							);
+						if (i.gridChannelRenderer)
+							return new BaseChannel({ client: target.client }).load(
+								i.gridChannelRenderer
+							);
+					}
 					return undefined;
 				})
 				.filter((i: YoutubeRawData) => i !== undefined);

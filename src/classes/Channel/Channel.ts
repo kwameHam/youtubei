@@ -4,11 +4,12 @@ import { PlaylistCompact } from "../PlaylistCompact";
 import { Thumbnails } from "../Thumbnails";
 import { VideoCompact } from "../VideoCompact";
 import { ChannelParser } from "./ChannelParser";
+import {ShortCompact} from "../ShortCompact";
 
 export interface Shelf {
 	title: string;
 	subtitle?: string;
-	items: BaseChannel[] | VideoCompact[] | PlaylistCompact[];
+	items: BaseChannel[] | VideoCompact[] | ShortCompact[] | PlaylistCompact[];
 }
 
 /** @hidden */
