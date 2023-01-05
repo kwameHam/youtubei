@@ -5,6 +5,7 @@ const BaseChannel_1 = require("../BaseChannel");
 const PlaylistCompact_1 = require("../PlaylistCompact");
 const Thumbnails_1 = require("../Thumbnails");
 const VideoCompact_1 = require("../VideoCompact");
+const ShortCompact_1 = require("../ShortCompact");
 class ChannelParser {
     static loadChannel(target, data) {
         var _a;
@@ -23,24 +24,34 @@ class ChannelParser {
         return target;
     }
     static parseShelves(target, data) {
+        var _a;
         const shelves = [];
         const rawShelves = data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
             .sectionListRenderer.contents;
         for (const rawShelf of rawShelves) {
-            const shelfRenderer = rawShelf.itemSectionRenderer.contents[0].shelfRenderer;
+            const shelfRenderer = rawShelf.itemSectionRenderer.contents[0].shelfRenderer || rawShelf.itemSectionRenderer.contents[0].reelShelfRenderer;
+            const isShortShelf = (rawShelf.itemSectionRenderer.contents[0].reelShelfRenderer);
             if (!shelfRenderer)
                 continue;
-            const { title, content, subtitle } = shelfRenderer;
-            if (!content.horizontalListRenderer)
+            const { title, subtitle } = shelfRenderer;
+            let renderer = isShortShelf ? shelfRenderer : (_a = shelfRenderer.content) === null || _a === void 0 ? void 0 : _a.horizontalListRenderer;
+            if (!renderer)
                 continue;
-            const items = content.horizontalListRenderer.items
+            const items = renderer.items
                 .map((i) => {
-                if (i.gridVideoRenderer)
-                    return new VideoCompact_1.VideoCompact({ client: target.client }).load(i.gridVideoRenderer);
-                if (i.gridPlaylistRenderer)
-                    return new PlaylistCompact_1.PlaylistCompact({ client: target.client }).load(i.gridPlaylistRenderer);
-                if (i.gridChannelRenderer)
-                    return new BaseChannel_1.BaseChannel({ client: target.client }).load(i.gridChannelRenderer);
+                if (isShortShelf) {
+                    if (i.reelItemRenderer) {
+                        return new ShortCompact_1.ShortCompact({ client: target.client }).load(i.reelItemRenderer);
+                    }
+                }
+                else {
+                    if (i.gridVideoRenderer)
+                        return new VideoCompact_1.VideoCompact({ client: target.client }).load(i.gridVideoRenderer);
+                    if (i.gridPlaylistRenderer)
+                        return new PlaylistCompact_1.PlaylistCompact({ client: target.client }).load(i.gridPlaylistRenderer);
+                    if (i.gridChannelRenderer)
+                        return new BaseChannel_1.BaseChannel({ client: target.client }).load(i.gridChannelRenderer);
+                }
                 return undefined;
             })
                 .filter((i) => i !== undefined);
