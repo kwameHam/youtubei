@@ -112,6 +112,6 @@ export class BaseVideoParser {
 		const accessibilityData = (
 			buttonRenderer.defaultText?.accessibility || buttonRenderer.accessibilityData
 		).accessibilityData;
-		return accessibilityData.label;
+		return accessibilityData?.label;
 	}
 }
