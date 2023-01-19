@@ -76,9 +76,9 @@ class BaseVideoParser {
             .filter((c) => c !== undefined);
     }
     static parseButtonRenderer(data) {
-        var _a;
+        var _a, _b;
         const buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
-        const accessibilityData = (((_a = buttonRenderer.defaultText) === null || _a === void 0 ? void 0 : _a.accessibility) || buttonRenderer.accessibilityData).accessibilityData;
+        const accessibilityData = (_b = (((_a = buttonRenderer === null || buttonRenderer === void 0 ? void 0 : buttonRenderer.defaultText) === null || _a === void 0 ? void 0 : _a.accessibility) || (buttonRenderer === null || buttonRenderer === void 0 ? void 0 : buttonRenderer.accessibilityData))) === null || _b === void 0 ? void 0 : _b.accessibilityData;
         return accessibilityData === null || accessibilityData === void 0 ? void 0 : accessibilityData.label;
     }
 }
