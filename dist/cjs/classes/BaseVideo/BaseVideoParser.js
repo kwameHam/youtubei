@@ -79,7 +79,7 @@ class BaseVideoParser {
         var _a;
         const buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
         const accessibilityData = (((_a = buttonRenderer.defaultText) === null || _a === void 0 ? void 0 : _a.accessibility) || buttonRenderer.accessibilityData).accessibilityData;
-        return accessibilityData.label;
+        return accessibilityData === null || accessibilityData === void 0 ? void 0 : accessibilityData.label;
     }
 }
 exports.BaseVideoParser = BaseVideoParser;
