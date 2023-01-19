@@ -110,8 +110,8 @@ export class BaseVideoParser {
 	private static parseButtonRenderer(data: YoutubeRawData): string {
 		const buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
 		const accessibilityData = (
-			buttonRenderer.defaultText?.accessibility || buttonRenderer.accessibilityData
-		).accessibilityData;
+			buttonRenderer?.defaultText?.accessibility || buttonRenderer?.accessibilityData
+		)?.accessibilityData;
 		return accessibilityData?.label;
 	}
 }
