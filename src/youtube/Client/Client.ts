@@ -23,6 +23,7 @@ export type ClientOptions = {
 	fetchOptions: Partial<RequestInit>;
 	/** Optional options passed when sending a request to youtube (context.client) */
 	youtubeClientOptions: Record<string, unknown>;
+	proxy:string;
 };
 
 /** Youtube Client */
@@ -34,6 +35,7 @@ export class Client {
 		const fullOptions: ClientOptions = {
 			initialCookie: "",
 			fetchOptions: {},
+			proxy: "",
 			...options,
 			youtubeClientOptions: {
 				hl: "en",

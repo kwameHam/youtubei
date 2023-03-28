@@ -1,5 +1,6 @@
 import fetch, { HeadersInit, RequestInit, Response as FetchResponse } from "node-fetch";
 import { URLSearchParams } from "url";
+import {HttpsProxyAgent} from "https-proxy-agent";
 
 type HTTPOptions = {
 	apiKey: string;
@@ -9,6 +10,7 @@ type HTTPOptions = {
 	fetchOptions?: Partial<RequestInit>;
 	youtubeClientOptions?: Record<string, unknown>;
 	initialCookie?: string;
+	proxy?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,6 +27,7 @@ type Options = {
  * @hidden
  */
 export class HTTP {
+	private proxy: string;
 	private apiKey: string;
 	private baseUrl: string;
 	private clientName: string;
@@ -33,8 +36,10 @@ export class HTTP {
 	private defaultHeaders: HeadersInit;
 	private defaultFetchOptions: Partial<RequestInit>;
 	private defaultClientOptions: Record<string, unknown>;
+	
 
 	constructor(options: HTTPOptions) {
+		this.proxy = options.proxy || "";
 		this.apiKey = options.apiKey;
 		this.baseUrl = options.baseUrl;
 		this.clientName = options.clientName;
@@ -92,6 +97,7 @@ export class HTTP {
 				...this.defaultFetchOptions.headers,
 			},
 			body: partialOptions.data ? JSON.stringify(partialOptions.data) : undefined,
+			agent: Boolean(this.proxy) ? new HttpsProxyAgent(this.proxy) :  undefined,
 		};
 
 		const finalUrl = `https://${this.baseUrl}/${url}?${new URLSearchParams(
