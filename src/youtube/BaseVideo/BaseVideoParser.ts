@@ -42,8 +42,8 @@ export class BaseVideoParser {
 
 		// related videos
 		const secondaryContents =
-			data[3].response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
-				.results;
+			data[3].response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
+				?.results;
 
 		if (secondaryContents) {
 			target.related.items = BaseVideoParser.parseRelatedFromSecondaryContent(
