@@ -23,7 +23,7 @@ export class ChannelParser {
 		target.thumbnails = new Thumbnails().load(avatar.thumbnails);
 		target.videoCount = videosCountText?.runs[0]?.text || 0;
 		target.channelHandle = channelHandleText?.runs[0]?.text || null;
-		target.badge = badges[0]?.metadataBadgeRenderer?.tooltip;
+		target.badge = (badges && badges.length > 0)? badges[0]?.metadataBadgeRenderer?.tooltip : null;
 		target.channelLink = data?.metadata?.channelMetadataRenderer?.ownerUrls[0] || null;
 		if (!target.channelLink && target.channelHandle) {
 			target.channelLink = 'http://www.youtube.com/'+target.channelHandle;

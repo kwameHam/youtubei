@@ -14,7 +14,7 @@ class ChannelParser {
         target.thumbnails = new common_1.Thumbnails().load(avatar.thumbnails);
         target.videoCount = ((_a = videosCountText === null || videosCountText === void 0 ? void 0 : videosCountText.runs[0]) === null || _a === void 0 ? void 0 : _a.text) || 0;
         target.channelHandle = ((_b = channelHandleText === null || channelHandleText === void 0 ? void 0 : channelHandleText.runs[0]) === null || _b === void 0 ? void 0 : _b.text) || null;
-        target.badge = (_d = (_c = badges[0]) === null || _c === void 0 ? void 0 : _c.metadataBadgeRenderer) === null || _d === void 0 ? void 0 : _d.tooltip;
+        target.badge = (badges && badges.length > 0) ? (_d = (_c = badges[0]) === null || _c === void 0 ? void 0 : _c.metadataBadgeRenderer) === null || _d === void 0 ? void 0 : _d.tooltip : null;
         target.channelLink = ((_f = (_e = data === null || data === void 0 ? void 0 : data.metadata) === null || _e === void 0 ? void 0 : _e.channelMetadataRenderer) === null || _f === void 0 ? void 0 : _f.ownerUrls[0]) || null;
         if (!target.channelLink && target.channelHandle) {
             target.channelLink = 'http://www.youtube.com/' + target.channelHandle;
