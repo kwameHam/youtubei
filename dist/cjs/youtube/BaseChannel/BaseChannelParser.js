@@ -4,13 +4,20 @@ exports.BaseChannelParser = void 0;
 const common_1 = require("../../common");
 class BaseChannelParser {
     static loadBaseChannel(target, data) {
-        var _a;
+        var _a, _b;
         const { channelId, title, thumbnail, videoCountText, subscriberCountText } = data;
         target.id = channelId;
         target.name = title.simpleText;
         target.thumbnails = new common_1.Thumbnails().load(thumbnail.thumbnails);
         target.videoCount = common_1.stripToInt((_a = videoCountText === null || videoCountText === void 0 ? void 0 : videoCountText.runs) === null || _a === void 0 ? void 0 : _a[0].text) || 0; // TODO this sometimes contains subscriber count for some reason
         target.subscriberCount = subscriberCountText === null || subscriberCountText === void 0 ? void 0 : subscriberCountText.simpleText;
+        try {
+            if (target.videoCount === 0 && ((_b = videoCountText === null || videoCountText === void 0 ? void 0 : videoCountText.simpleText) === null || _b === void 0 ? void 0 : _b.includes('subscribers'))) {
+                target.videoCountWrong = videoCountText.simpleText;
+            }
+        }
+        catch (e) {
+        }
         return target;
     }
     /** Parse tab data from request, tab name is ignored if it's a continuation data */
