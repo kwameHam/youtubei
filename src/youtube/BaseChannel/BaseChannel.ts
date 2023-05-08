@@ -24,6 +24,8 @@ export class BaseChannel extends Base implements BaseChannelProperties {
 	thumbnails?: Thumbnails;
 	/** How many video does this channel have */
 	videoCount?: number;
+	/** How many video does this channel have */
+	videoCountWrong?: number;
 	/** The @channel of the channel which is unique */
 	channelHandle?: string;
 	/** badges show verified status of the Channel */

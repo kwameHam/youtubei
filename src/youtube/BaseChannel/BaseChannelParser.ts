@@ -19,6 +19,14 @@ export class BaseChannelParser {
 		target.thumbnails = new Thumbnails().load(thumbnail.thumbnails);
 		target.videoCount = stripToInt(videoCountText?.runs?.[0].text) || 0; // TODO this sometimes contains subscriber count for some reason
 		target.subscriberCount = subscriberCountText?.simpleText;
+		try{
+			if (target.videoCount === 0 && videoCountText?.simpleText?.includes('subscribers')) {
+				target.videoCountWrong = videoCountText.simpleText
+			}
+		}catch (e) {
+			
+		}
+		
 
 		return target;
 	}
