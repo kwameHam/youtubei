@@ -22,13 +22,13 @@ class BaseChannelParser {
     }
     /** Parse tab data from request, tab name is ignored if it's a continuation data */
     static parseTabData(name, data) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         const tab = (_a = data.contents) === null || _a === void 0 ? void 0 : _a.twoColumnBrowseResultsRenderer.tabs.find((t) => {
             var _a;
             return (((_a = t.tabRenderer) === null || _a === void 0 ? void 0 : _a.endpoint.browseEndpoint.params) ===
                 BaseChannelParser.TAB_TYPE_PARAMS[name]);
         });
-        return (((_d = (_c = (_b = tab === null || tab === void 0 ? void 0 : tab.tabRenderer.content.sectionListRenderer) === null || _b === void 0 ? void 0 : _b.contents) === null || _c === void 0 ? void 0 : _c[0].itemSectionRenderer.contents[0].gridRenderer) === null || _d === void 0 ? void 0 : _d.items) || (tab === null || tab === void 0 ? void 0 : tab.tabRenderer.content.richGridRenderer.contents.map((c) => { var _a; return ((_a = c.richItemRenderer) === null || _a === void 0 ? void 0 : _a.content) || c; })) || ((_e = data.onResponseReceivedActions) === null || _e === void 0 ? void 0 : _e[0].appendContinuationItemsAction.continuationItems.map((c) => { var _a; return ((_a = c.richItemRenderer) === null || _a === void 0 ? void 0 : _a.content) || c; })) ||
+        return (((_d = (_c = (_b = tab === null || tab === void 0 ? void 0 : tab.tabRenderer.content.sectionListRenderer) === null || _b === void 0 ? void 0 : _b.contents) === null || _c === void 0 ? void 0 : _c[0].itemSectionRenderer.contents[0].gridRenderer) === null || _d === void 0 ? void 0 : _d.items) || ((_g = (_f = (_e = tab === null || tab === void 0 ? void 0 : tab.tabRenderer) === null || _e === void 0 ? void 0 : _e.content) === null || _f === void 0 ? void 0 : _f.richGridRenderer) === null || _g === void 0 ? void 0 : _g.contents.map((c) => { var _a; return ((_a = c === null || c === void 0 ? void 0 : c.richItemRenderer) === null || _a === void 0 ? void 0 : _a.content) || c; })) || ((_h = data.onResponseReceivedActions) === null || _h === void 0 ? void 0 : _h[0].appendContinuationItemsAction.continuationItems.map((c) => { var _a; return ((_a = c === null || c === void 0 ? void 0 : c.richItemRenderer) === null || _a === void 0 ? void 0 : _a.content) || c; })) ||
             []);
     }
 }
