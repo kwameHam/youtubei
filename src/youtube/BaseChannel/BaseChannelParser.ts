@@ -43,11 +43,11 @@ export class BaseChannelParser {
 		return (
 			tab?.tabRenderer.content.sectionListRenderer?.contents?.[0].itemSectionRenderer
 				.contents[0].gridRenderer?.items ||
-			tab?.tabRenderer.content.richGridRenderer.contents.map(
-				(c: YoutubeRawData) => c.richItemRenderer?.content || c
+			tab?.tabRenderer?.content?.richGridRenderer?.contents.map(
+				(c: YoutubeRawData) => c?.richItemRenderer?.content || c
 			) ||
 			data.onResponseReceivedActions?.[0].appendContinuationItemsAction.continuationItems.map(
-				(c: YoutubeRawData) => c.richItemRenderer?.content || c
+				(c: YoutubeRawData) => c?.richItemRenderer?.content || c
 			) ||
 			[]
 		);
