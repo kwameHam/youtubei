@@ -23,8 +23,8 @@ export class PlaylistCompactParser {
 		);
 
 		// Channel
-		if (shortBylineText && shortBylineText.simpleText !== "YouTube") {
-			const shortByLine = shortBylineText.runs[0];
+		const shortByLine = this.getShortByLine(data)
+		if (shortBylineText && shortBylineText.simpleText !== "YouTube" && shortByLine) {
 			target.channel = new BaseChannel({
 				id: shortByLine.navigationEndpoint.browseEndpoint.browseId,
 				name: shortByLine.text,
@@ -33,5 +33,18 @@ export class PlaylistCompactParser {
 		}
 
 		return target;
+	}
+
+	static getShortByLine(data) {
+		if (!data || !data.shortBylineText || !data.shortBylineText.runs) {
+			return false
+		}
+
+		for (const d of data.shortBylineText.runs) {
+			if (d.navigationEndpoint && d.navigationEndpoint.browseEndpoint) {
+				return d
+			}
+		}
+		return false
 	}
 }
