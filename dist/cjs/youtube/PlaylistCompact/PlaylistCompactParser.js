@@ -13,8 +13,8 @@ class PlaylistCompactParser {
         // Thumbnail
         target.thumbnails = new common_1.Thumbnails().load(((_a = data.thumbnails) === null || _a === void 0 ? void 0 : _a[0].thumbnails) || thumbnail.thumbnails);
         // Channel
-        if (shortBylineText && shortBylineText.simpleText !== "YouTube") {
-            const shortByLine = shortBylineText.runs[0];
+        const shortByLine = this.getShortByLine(data);
+        if (shortBylineText && shortBylineText.simpleText !== "YouTube" && shortByLine) {
             target.channel = new BaseChannel_1.BaseChannel({
                 id: shortByLine.navigationEndpoint.browseEndpoint.browseId,
                 name: shortByLine.text,
@@ -22,6 +22,17 @@ class PlaylistCompactParser {
             });
         }
         return target;
+    }
+    static getShortByLine(data) {
+        if (!data || !data.shortBylineText || !data.shortBylineText.runs) {
+            return false;
+        }
+        for (const d of data.shortBylineText.runs) {
+            if (d.navigationEndpoint && d.navigationEndpoint.browseEndpoint) {
+                return d;
+            }
+        }
+        return false;
     }
 }
 exports.PlaylistCompactParser = PlaylistCompactParser;
