@@ -32,7 +32,8 @@ class VideoCompactParser {
                 });
             }
         }
-        target.viewCount = common_1.stripToInt((viewCountText === null || viewCountText === void 0 ? void 0 : viewCountText.simpleText) || (viewCountText === null || viewCountText === void 0 ? void 0 : viewCountText.runs[0].text));
+        target.viewCount = (viewCountText === null || viewCountText === void 0 ? void 0 : viewCountText.simpleText) || (viewCountText === null || viewCountText === void 0 ? void 0 : viewCountText.runs[0].text);
+        // target.viewCount = stripToInt(viewCountText?.simpleText || viewCountText?.runs[0].text);
         return target;
     }
 }

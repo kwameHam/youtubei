@@ -12,8 +12,12 @@ class BaseVideoParser {
         // Basic information
         target.id = videoInfo.videoDetails.videoId;
         target.title = videoInfo.videoDetails.title;
-        target.uploadDate = videoInfo.dateText.simpleText;
+        target.uploadDate = videoInfo.microformat.uploadDate || videoInfo.dateText.simpleText;
+        target.publishDate = videoInfo.microformat.publishDate || null;
         target.viewCount = +videoInfo.videoDetails.viewCount || null;
+        target.keywords = videoInfo.videoDetails.keywords || null;
+        target.category = videoInfo.microformat.category || null;
+        target.isFamilySafe = videoInfo.microformat.isFamilySafe || null;
         target.isLiveContent = videoInfo.videoDetails.isLiveContent;
         target.thumbnails = new common_1.Thumbnails().load(videoInfo.videoDetails.thumbnail.thumbnails);
         // Channel
@@ -32,7 +36,7 @@ class BaseVideoParser {
         target.tags =
             ((_b = (_a = videoInfo.superTitleLink) === null || _a === void 0 ? void 0 : _a.runs) === null || _b === void 0 ? void 0 : _b.map((r) => r.text.trim()).filter((t) => t)) || [];
         target.description =
-            ((_c = videoInfo.description) === null || _c === void 0 ? void 0 : _c.runs.map((d) => d.text).join("")) || "";
+            videoInfo.videoDetails.shortDescription || videoInfo.microformat.description.simpleText || ((_c = videoInfo.description) === null || _c === void 0 ? void 0 : _c.runs.map((d) => d.text).join("")) || "";
         // related videos
         const secondaryContents = (_f = (_e = (_d = data[3].response.contents.twoColumnWatchNextResults) === null || _d === void 0 ? void 0 : _d.secondaryResults) === null || _e === void 0 ? void 0 : _e.secondaryResults) === null || _f === void 0 ? void 0 : _f.results;
         if (secondaryContents) {
@@ -55,7 +59,8 @@ class BaseVideoParser {
             .videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
         const videoDetails = data[2].playerResponse.videoDetails;
-        return Object.assign(Object.assign(Object.assign({}, secondaryInfo), primaryInfo), { videoDetails });
+        const microformat = data[2].playerResponse.microformat.playerMicroformatRenderer;
+        return Object.assign(Object.assign(Object.assign({}, secondaryInfo), primaryInfo), { videoDetails, microformat });
     }
     static parseCompactRenderer(data, client) {
         if ("compactVideoRenderer" in data) {
