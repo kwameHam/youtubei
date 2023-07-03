@@ -12,8 +12,12 @@ export class BaseVideoParser {
 		// Basic information
 		target.id = videoInfo.videoDetails.videoId;
 		target.title = videoInfo.videoDetails.title;
-		target.uploadDate = videoInfo.dateText.simpleText;
+		target.uploadDate = videoInfo.microformat.uploadDate || videoInfo.dateText.simpleText;
+		target.publishDate = videoInfo.microformat.publishDate || null;
 		target.viewCount = +videoInfo.videoDetails.viewCount || null;
+		target.keywords = videoInfo.videoDetails.keywords || null;
+		target.category = videoInfo.microformat.category || null;
+		target.isFamilySafe = videoInfo.microformat.isFamilySafe || null;
 		target.isLiveContent = videoInfo.videoDetails.isLiveContent;
 		target.thumbnails = new Thumbnails().load(videoInfo.videoDetails.thumbnail.thumbnails);
 
@@ -38,7 +42,7 @@ export class BaseVideoParser {
 				?.map((r: YoutubeRawData) => r.text.trim())
 				.filter((t: string) => t) || [];
 		target.description =
-			videoInfo.description?.runs.map((d: Record<string, string>) => d.text).join("") || "";
+			videoInfo.videoDetails.shortDescription || videoInfo.microformat.description.simpleText || videoInfo.description?.runs.map((d: Record<string, string>) => d.text).join("") || "";
 
 		// related videos
 		const secondaryContents =
@@ -80,7 +84,8 @@ export class BaseVideoParser {
 			(c: YoutubeRawData) => "videoSecondaryInfoRenderer" in c
 		).videoSecondaryInfoRenderer;
 		const videoDetails = data[2].playerResponse.videoDetails;
-		return { ...secondaryInfo, ...primaryInfo, videoDetails };
+		const microformat = data[2].playerResponse.microformat.playerMicroformatRenderer;
+		return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
 	}
 
 	private static parseCompactRenderer(

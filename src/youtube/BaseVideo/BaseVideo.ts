@@ -14,10 +14,14 @@ export interface BaseVideoProperties extends BaseProperties {
 	description?: string;
 	channel?: BaseChannel;
 	uploadDate?: string;
+	publishDate?: string | null;
 	viewCount?: number | null;
 	likeCount?: number | null;
 	isLiveContent?: boolean;
 	tags?: string[];
+	keywords?: string[] | null;
+	category?: string | null;
+	isFamilySafe?: boolean | null;
 }
 
 /** Represents a Video  */
@@ -33,6 +37,8 @@ export class BaseVideo extends Base implements BaseVideoProperties {
 	channel!: BaseChannel;
 	/** The date this video is uploaded at */
 	uploadDate!: string;
+	/** The date this video is published at */
+	publishDate!: string | null;
 	/** How many view does this video have, null if the view count is hidden */
 	viewCount!: number | null;
 	/** How many like does this video have, null if the like count is hidden */
@@ -41,6 +47,12 @@ export class BaseVideo extends Base implements BaseVideoProperties {
 	isLiveContent!: boolean;
 	/** The tags of this video */
 	tags!: string[];
+	/** The keywords of this video */
+	keywords!: string[] | null;
+	/** The category of this video */
+	category!: string | null;
+	/** Is content of this video Family safe */
+	isFamilySafe!: boolean | null;
 	/** Continuable of videos / playlists related to this video  */
 	related: VideoRelated;
 
