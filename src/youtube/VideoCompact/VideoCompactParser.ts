@@ -58,7 +58,8 @@ export class VideoCompactParser {
 			}
 		}
 
-		target.viewCount = stripToInt(viewCountText?.simpleText || viewCountText?.runs[0].text);
+		target.viewCount = viewCountText?.simpleText || viewCountText?.runs[0].text;
+		// target.viewCount = stripToInt(viewCountText?.simpleText || viewCountText?.runs[0].text);
 
 		return target;
 	}
