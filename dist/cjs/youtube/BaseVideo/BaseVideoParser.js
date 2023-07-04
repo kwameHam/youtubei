@@ -7,7 +7,7 @@ const PlaylistCompact_1 = require("../PlaylistCompact");
 const VideoCompact_1 = require("../VideoCompact");
 class BaseVideoParser {
     static loadBaseVideo(target, data) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         const videoInfo = BaseVideoParser.parseRawData(data);
         // Basic information
         target.id = videoInfo.videoDetails.videoId;
@@ -36,9 +36,9 @@ class BaseVideoParser {
         target.tags =
             ((_b = (_a = videoInfo.superTitleLink) === null || _a === void 0 ? void 0 : _a.runs) === null || _b === void 0 ? void 0 : _b.map((r) => r.text.trim()).filter((t) => t)) || [];
         target.description =
-            videoInfo.videoDetails.shortDescription || videoInfo.microformat.description.simpleText || ((_c = videoInfo.description) === null || _c === void 0 ? void 0 : _c.runs.map((d) => d.text).join("")) || "";
+            videoInfo.videoDetails.shortDescription || ((_d = (_c = videoInfo.microformat) === null || _c === void 0 ? void 0 : _c.description) === null || _d === void 0 ? void 0 : _d.simpleText) || ((_e = videoInfo.description) === null || _e === void 0 ? void 0 : _e.runs.map((d) => d.text).join("")) || "";
         // related videos
-        const secondaryContents = (_f = (_e = (_d = data[3].response.contents.twoColumnWatchNextResults) === null || _d === void 0 ? void 0 : _d.secondaryResults) === null || _e === void 0 ? void 0 : _e.secondaryResults) === null || _f === void 0 ? void 0 : _f.results;
+        const secondaryContents = (_h = (_g = (_f = data[3].response.contents.twoColumnWatchNextResults) === null || _f === void 0 ? void 0 : _f.secondaryResults) === null || _g === void 0 ? void 0 : _g.secondaryResults) === null || _h === void 0 ? void 0 : _h.results;
         if (secondaryContents) {
             target.related.items = BaseVideoParser.parseRelatedFromSecondaryContent(secondaryContents, target.client);
             target.related.continuation = common_1.getContinuationFromItems(secondaryContents);
