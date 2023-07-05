@@ -85,6 +85,15 @@ class Client {
                 : new LiveVideo_1.LiveVideo({ client: this }).load(response.data));
         });
     }
+    /** Get Channel information by channel handel */
+    getAbout(channelHandle) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.http.get(`${channelHandle}/about`, {
+                params: { pbj: "1" },
+            });
+            return response;
+        });
+    }
     /** Get channel information by channel id+ */
     getChannel(channelId) {
         var _a, _b, _c;
