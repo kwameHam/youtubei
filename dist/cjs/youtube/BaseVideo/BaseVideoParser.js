@@ -9,7 +9,7 @@ class BaseVideoParser {
     static loadBaseVideo(target, data) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         const videoInfo = BaseVideoParser.parseRawData(data);
-        if (videoInfo.isDelted) {
+        if (videoInfo.isDeleted) {
             target.isDeleted = true;
             return target;
         }
@@ -74,8 +74,7 @@ class BaseVideoParser {
                 return { isError: true };
             }
         }
-        const primaryInfo = contents.find((c) => "videoPrimaryInfoRenderer" in c)
-            .videoPrimaryInfoRenderer;
+        const primaryInfo = videoPrimaryInfoRenderer.videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
         const videoDetails = data[2].playerResponse.videoDetails;
         const microformat = data[2].playerResponse.microformat.playerMicroformatRenderer;

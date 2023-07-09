@@ -8,7 +8,7 @@ class VideoParser {
     static loadVideo(target, data) {
         var _a, _b, _c, _d;
         const videoInfo = BaseVideo_1.BaseVideoParser.parseRawData(data);
-        if (videoInfo.isDelted) {
+        if (videoInfo.isDeleted) {
             target.isDeleted = true;
             return target;
         }
