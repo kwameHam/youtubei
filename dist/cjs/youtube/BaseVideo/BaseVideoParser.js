@@ -9,6 +9,14 @@ class BaseVideoParser {
     static loadBaseVideo(target, data) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         const videoInfo = BaseVideoParser.parseRawData(data);
+        if (videoInfo.isDelted) {
+            target.isDeleted = true;
+            return target;
+        }
+        else if (videoInfo.isError) {
+            target.isError = true;
+            return target;
+        }
         // Basic information
         target.id = videoInfo.videoDetails.videoId;
         target.title = videoInfo.videoDetails.title;
@@ -55,6 +63,17 @@ class BaseVideoParser {
     }
     static parseRawData(data) {
         const contents = data[3].response.contents.twoColumnWatchNextResults.results.results.contents;
+        const videoPrimaryInfoRenderer = contents.find((c) => "videoPrimaryInfoRenderer" in c);
+        if (!videoPrimaryInfoRenderer) {
+            let playabilityStatus = data[2].playerResponse.playabilityStatus;
+            if (playabilityStatus && playabilityStatus.status === "ERROR") {
+                if (playabilityStatus.reason === "Video nicht verfügbar") {
+                    return { isDeleted: true };
+                }
+                console.log('BaseVideoParser -> parseRawData error:', playabilityStatus.reason);
+                return { isError: true };
+            }
+        }
         const primaryInfo = contents.find((c) => "videoPrimaryInfoRenderer" in c)
             .videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;

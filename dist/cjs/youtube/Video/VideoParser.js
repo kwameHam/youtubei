@@ -8,6 +8,14 @@ class VideoParser {
     static loadVideo(target, data) {
         var _a, _b, _c, _d;
         const videoInfo = BaseVideo_1.BaseVideoParser.parseRawData(data);
+        if (videoInfo.isDelted) {
+            target.isDeleted = true;
+            return target;
+        }
+        else if (videoInfo.isError) {
+            target.isError = true;
+            return target;
+        }
         target.duration = +videoInfo.videoDetails.lengthSeconds;
         const itemSectionRenderer = (_a = data[3].response.contents.twoColumnWatchNextResults.results.results.contents
             .reverse()
