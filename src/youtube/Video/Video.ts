@@ -14,6 +14,7 @@ export type Chapter = {
 interface VideoProperties extends BaseVideoProperties {
 	duration?: number;
 	comments?: VideoComments;
+	commentCount?: number | null
 	chapters?: Chapter[];
 }
 
@@ -25,6 +26,7 @@ export class Video extends BaseVideo implements VideoProperties {
 	chapters!: Chapter[];
 	/** {@link Continuable} of videos inside a {@link Video} */
 	comments: VideoComments;
+	commentCount!: number | null
 
 	/** @hidden */
 	constructor(attr: VideoProperties) {

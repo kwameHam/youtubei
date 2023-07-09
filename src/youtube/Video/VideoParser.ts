@@ -6,12 +6,29 @@ import { Video } from "./Video";
 export class VideoParser {
 	static loadVideo(target: Video, data: YoutubeRawData): Video {
 		const videoInfo = BaseVideoParser.parseRawData(data);
+		if (videoInfo.isDeleted) {
+			target.isDeleted = true
+			return target;
+		}else if (videoInfo.isError) {
+			target.isError = true
+			return target;
+		}
 		target.duration = +videoInfo.videoDetails.lengthSeconds;
 
 		const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents
 			.reverse()
 			.find((c: YoutubeRawData) => c.itemSectionRenderer)?.itemSectionRenderer;
 
+		for (const content of data[3].response.contents.twoColumnWatchNextResults.results.results.contents) {
+			if (content.itemSectionRenderer && content.itemSectionRenderer.contents) {
+				for (const c of content.itemSectionRenderer.contents) {
+					if (c.commentsEntryPointHeaderRenderer) {
+						target.commentCount = c.commentsEntryPointHeaderRenderer.commentCount?.simpleText || null
+					}
+				}
+			}
+		}
+			
 		target.comments.continuation = getContinuationFromItems(
 			itemSectionRenderer?.contents || []
 		);

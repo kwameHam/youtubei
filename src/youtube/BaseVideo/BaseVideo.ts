@@ -22,6 +22,8 @@ export interface BaseVideoProperties extends BaseProperties {
 	keywords?: string[] | null;
 	category?: string | null;
 	isFamilySafe?: boolean | null;
+	isDeleted?: boolean | false;
+	isError?: boolean | false;
 }
 
 /** Represents a Video  */
@@ -53,7 +55,11 @@ export class BaseVideo extends Base implements BaseVideoProperties {
 	category!: string | null;
 	/** Is content of this video Family safe */
 	isFamilySafe!: boolean | null;
-	/** Continuable of videos / playlists related to this video  */
+	/** Is content of this video Family safe */
+	isDeleted!: boolean | false;
+	/** video is Deleted */
+	isError!: boolean | false;
+	/** Error happened */
 	related: VideoRelated;
 
 	/** @hidden */

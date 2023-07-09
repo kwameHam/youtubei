@@ -35,7 +35,7 @@ export class PlaylistCompactParser {
 		return target;
 	}
 
-	static getShortByLine(data) {
+	static getShortByLine(data:any) {
 		if (!data || !data.shortBylineText || !data.shortBylineText.runs) {
 			return false
 		}

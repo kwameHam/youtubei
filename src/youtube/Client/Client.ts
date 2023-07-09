@@ -119,6 +119,15 @@ export class Client {
 			: new LiveVideo({ client: this }).load(response.data)) as T;
 	}
 
+	/** Get Channel information by channel handel */
+	async getAbout(channelHandle:string) {
+		const response = await this.http.get(`${channelHandle}/about`, {
+			params: { pbj: "1" },
+		});
+
+		return response
+	}
+
 	/** Get channel information by channel id+ */
 	async getChannel(channelId: string): Promise<Channel | undefined> {
 		const response = await this.http.post(`${I_END_POINT}/browse`, {

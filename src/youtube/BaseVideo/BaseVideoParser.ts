@@ -8,7 +8,13 @@ import { BaseVideo } from "./BaseVideo";
 export class BaseVideoParser {
 	static loadBaseVideo(target: BaseVideo, data: YoutubeRawData): BaseVideo {
 		const videoInfo = BaseVideoParser.parseRawData(data);
-
+		if (videoInfo.isDeleted) {
+			target.isDeleted = true
+			return target;
+		}else if (videoInfo.isError) {
+			target.isError = true
+			return target;
+		}
 		// Basic information
 		target.id = videoInfo.videoDetails.videoId;
 		target.title = videoInfo.videoDetails.title;
@@ -42,7 +48,7 @@ export class BaseVideoParser {
 				?.map((r: YoutubeRawData) => r.text.trim())
 				.filter((t: string) => t) || [];
 		target.description =
-			videoInfo.videoDetails.shortDescription || videoInfo.microformat.description.simpleText || videoInfo.description?.runs.map((d: Record<string, string>) => d.text).join("") || "";
+			videoInfo.videoDetails.shortDescription || videoInfo.microformat?.description?.simpleText || videoInfo.description?.runs.map((d: Record<string, string>) => d.text).join("") || "";
 
 		// related videos
 		const secondaryContents =
@@ -78,8 +84,20 @@ export class BaseVideoParser {
 		const contents =
 			data[3].response.contents.twoColumnWatchNextResults.results.results.contents;
 
-		const primaryInfo = contents.find((c: YoutubeRawData) => "videoPrimaryInfoRenderer" in c)
-			.videoPrimaryInfoRenderer;
+		const videoPrimaryInfoRenderer = contents.find((c: YoutubeRawData) => "videoPrimaryInfoRenderer" in c)
+
+		if (!videoPrimaryInfoRenderer) {
+			let playabilityStatus = data[2].playerResponse.playabilityStatus
+			if (playabilityStatus && playabilityStatus.status === "ERROR") {
+				if (playabilityStatus.reason ==="Video nicht verfügbar") {
+					return {isDeleted:true}
+				}
+				console.log('BaseVideoParser -> parseRawData error:',playabilityStatus.reason)
+				return {isError:true}
+			}
+		}
+		
+		const primaryInfo = videoPrimaryInfoRenderer.videoPrimaryInfoRenderer;
 		const secondaryInfo = contents.find(
 			(c: YoutubeRawData) => "videoSecondaryInfoRenderer" in c
 		).videoSecondaryInfoRenderer;

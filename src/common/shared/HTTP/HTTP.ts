@@ -50,6 +50,7 @@ export class HTTP {
 			"x-youtube-client-name": "1",
 			"content-type": "application/json",
 			"accept-encoding": "gzip, deflate, br",
+			"Accept-Language": "de-DE,de;q=0.9",
 		};
 		this.defaultFetchOptions = options.fetchOptions || {};
 		this.defaultClientOptions = options.youtubeClientOptions || {};
