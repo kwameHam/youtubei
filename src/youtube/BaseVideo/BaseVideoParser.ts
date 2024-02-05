@@ -131,8 +131,13 @@ export class BaseVideoParser {
 		if (!data.segmentedLikeDislikeButtonRenderer) {
 			buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
 		} else {
-			const likeButton = data.segmentedLikeDislikeButtonRenderer.likeButton;
-			buttonRenderer = likeButton.toggleButtonRenderer || likeButton.buttonRenderer;
+			try {
+				const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel
+				buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title|| likeButton.defaultButtonViewModel.buttonViewModel.title
+				return buttonRenderer
+			} catch (e) {
+				return ''
+			}
 		}
 
 		const accessibilityData = (
