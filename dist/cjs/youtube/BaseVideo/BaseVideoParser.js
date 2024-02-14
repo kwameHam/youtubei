@@ -94,23 +94,15 @@ class BaseVideoParser {
             .filter((c) => c !== undefined);
     }
     static parseButtonRenderer(data) {
-        var _a;
         let buttonRenderer;
-        if (!data.segmentedLikeDislikeButtonRenderer) {
-            buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
+        try {
+            const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
+            buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title || likeButton.defaultButtonViewModel.buttonViewModel.title;
+            return buttonRenderer;
         }
-        else {
-            try {
-                const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
-                buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title || likeButton.defaultButtonViewModel.buttonViewModel.title;
-                return buttonRenderer;
-            }
-            catch (e) {
-                return '';
-            }
+        catch (e) {
+            return '';
         }
-        const accessibilityData = (((_a = buttonRenderer.defaultText) === null || _a === void 0 ? void 0 : _a.accessibility) || buttonRenderer.accessibilityData).accessibilityData;
-        return accessibilityData.label;
     }
 }
 exports.BaseVideoParser = BaseVideoParser;
