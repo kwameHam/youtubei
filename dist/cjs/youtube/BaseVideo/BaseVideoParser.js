@@ -100,8 +100,14 @@ class BaseVideoParser {
             buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
         }
         else {
-            const likeButton = data.segmentedLikeDislikeButtonRenderer.likeButton;
-            buttonRenderer = likeButton.toggleButtonRenderer || likeButton.buttonRenderer;
+            try {
+                const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
+                buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title || likeButton.defaultButtonViewModel.buttonViewModel.title;
+                return buttonRenderer;
+            }
+            catch (e) {
+                return '';
+            }
         }
         const accessibilityData = (((_a = buttonRenderer.defaultText) === null || _a === void 0 ? void 0 : _a.accessibility) || buttonRenderer.accessibilityData).accessibilityData;
         return accessibilityData.label;
