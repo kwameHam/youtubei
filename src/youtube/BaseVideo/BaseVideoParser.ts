@@ -128,22 +128,12 @@ export class BaseVideoParser {
 
 	private static parseButtonRenderer(data: YoutubeRawData): string {
 		let buttonRenderer;
-		if (!data.segmentedLikeDislikeButtonRenderer) {
-			buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
-		} else {
-			try {
-				const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel
-				buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title|| likeButton.defaultButtonViewModel.buttonViewModel.title
-				return buttonRenderer
-			} catch (e) {
-				return ''
-			}
+		try {
+			const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel
+			buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title|| likeButton.defaultButtonViewModel.buttonViewModel.title
+			return buttonRenderer
+		} catch (e) {
+			return ''
 		}
-
-		const accessibilityData = (
-			buttonRenderer.defaultText?.accessibility || buttonRenderer.accessibilityData
-		).accessibilityData;
-
-		return accessibilityData.label;
 	}
 }
