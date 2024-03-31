@@ -15,11 +15,11 @@ export class VideoParser {
 		}
 		target.duration = +videoInfo.videoDetails.lengthSeconds;
 
-		const itemSectionRenderer = data[3].response.contents.twoColumnWatchNextResults.results.results.contents
+		const itemSectionRenderer = data.response.contents.twoColumnWatchNextResults.results.results.contents
 			.reverse()
 			.find((c: YoutubeRawData) => c.itemSectionRenderer)?.itemSectionRenderer;
 
-		for (const content of data[3].response.contents.twoColumnWatchNextResults.results.results.contents) {
+		for (const content of data.response.contents.twoColumnWatchNextResults.results.results.contents) {
 			if (content.itemSectionRenderer && content.itemSectionRenderer.contents) {
 				for (const c of content.itemSectionRenderer.contents) {
 					if (c.commentsEntryPointHeaderRenderer) {

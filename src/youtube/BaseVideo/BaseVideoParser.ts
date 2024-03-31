@@ -82,12 +82,12 @@ export class BaseVideoParser {
 
 	static parseRawData(data: YoutubeRawData): YoutubeRawData {
 		const contents =
-			data[3].response.contents.twoColumnWatchNextResults.results.results.contents;
+			data.response.contents.twoColumnWatchNextResults.results.results.contents;
 
 		const videoPrimaryInfoRenderer = contents.find((c: YoutubeRawData) => "videoPrimaryInfoRenderer" in c)
 
 		if (!videoPrimaryInfoRenderer) {
-			let playabilityStatus = data[2].playerResponse.playabilityStatus
+			let playabilityStatus = data.playerResponse.playabilityStatus
 			if (playabilityStatus && playabilityStatus.status === "ERROR") {
 				if (playabilityStatus.reason ==="Video nicht verfügbar") {
 					return {isDeleted:true}
@@ -101,8 +101,8 @@ export class BaseVideoParser {
 		const secondaryInfo = contents.find(
 			(c: YoutubeRawData) => "videoSecondaryInfoRenderer" in c
 		).videoSecondaryInfoRenderer;
-		const videoDetails = data[2].playerResponse.videoDetails;
-		const microformat = data[2].playerResponse.microformat.playerMicroformatRenderer;
+		const videoDetails = data.playerResponse.videoDetails;
+		const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
 		return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
 	}
 
