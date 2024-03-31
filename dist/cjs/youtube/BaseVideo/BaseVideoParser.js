@@ -46,7 +46,7 @@ class BaseVideoParser {
         target.description =
             videoInfo.videoDetails.shortDescription || ((_d = (_c = videoInfo.microformat) === null || _c === void 0 ? void 0 : _c.description) === null || _d === void 0 ? void 0 : _d.simpleText) || ((_e = videoInfo.description) === null || _e === void 0 ? void 0 : _e.runs.map((d) => d.text).join("")) || "";
         // related videos
-        const secondaryContents = (_h = (_g = (_f = data[3].response.contents.twoColumnWatchNextResults) === null || _f === void 0 ? void 0 : _f.secondaryResults) === null || _g === void 0 ? void 0 : _g.secondaryResults) === null || _h === void 0 ? void 0 : _h.results;
+        const secondaryContents = (_h = (_g = (_f = data.response.contents.twoColumnWatchNextResults) === null || _f === void 0 ? void 0 : _f.secondaryResults) === null || _g === void 0 ? void 0 : _g.secondaryResults) === null || _h === void 0 ? void 0 : _h.results;
         if (secondaryContents) {
             target.related.items = BaseVideoParser.parseRelatedFromSecondaryContent(secondaryContents, target.client);
             target.related.continuation = common_1.getContinuationFromItems(secondaryContents);
