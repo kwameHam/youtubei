@@ -17,10 +17,10 @@ class VideoParser {
             return target;
         }
         target.duration = +videoInfo.videoDetails.lengthSeconds;
-        const itemSectionRenderer = (_a = data[3].response.contents.twoColumnWatchNextResults.results.results.contents
+        const itemSectionRenderer = (_a = data.response.contents.twoColumnWatchNextResults.results.results.contents
             .reverse()
             .find((c) => c.itemSectionRenderer)) === null || _a === void 0 ? void 0 : _a.itemSectionRenderer;
-        for (const content of data[3].response.contents.twoColumnWatchNextResults.results.results.contents) {
+        for (const content of data.response.contents.twoColumnWatchNextResults.results.results.contents) {
             if (content.itemSectionRenderer && content.itemSectionRenderer.contents) {
                 for (const c of content.itemSectionRenderer.contents) {
                     if (c.commentsEntryPointHeaderRenderer) {
