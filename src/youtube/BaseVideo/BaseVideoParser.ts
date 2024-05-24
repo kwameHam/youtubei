@@ -4,6 +4,7 @@ import { Client } from "../Client";
 import { PlaylistCompact } from "../PlaylistCompact";
 import { VideoCompact } from "../VideoCompact";
 import { BaseVideo } from "./BaseVideo";
+import { VideoCaptions } from "./VideoCaptions";
 
 export class BaseVideoParser {
 	static loadBaseVideo(target: BaseVideo, data: YoutubeRawData): BaseVideo {
@@ -63,6 +64,13 @@ export class BaseVideoParser {
 			target.related.continuation = getContinuationFromItems(secondaryContents);
 		}
 
+		// captions
+		if (videoInfo.captions) {
+			target.captions = new VideoCaptions({ client: target.client, video: target }).load(
+				videoInfo.captions.playerCaptionsTracklistRenderer
+			);
+		}
+
 		return target;
 	}
 
@@ -81,8 +89,7 @@ export class BaseVideoParser {
 	}
 
 	static parseRawData(data: YoutubeRawData): YoutubeRawData {
-		const contents =
-			data.response.contents.twoColumnWatchNextResults.results.results.contents;
+		const contents = data.response.contents.twoColumnWatchNextResults.results.results.contents;
 
 		const videoPrimaryInfoRenderer = contents.find((c: YoutubeRawData) => "videoPrimaryInfoRenderer" in c)
 
@@ -101,6 +108,8 @@ export class BaseVideoParser {
 		const secondaryInfo = contents.find(
 			(c: YoutubeRawData) => "videoSecondaryInfoRenderer" in c
 		).videoSecondaryInfoRenderer;
+		const { videoDetails, captions } = data.playerResponse;
+		return { ...secondaryInfo, ...primaryInfo, videoDetails, captions };
 		const videoDetails = data.playerResponse.videoDetails;
 		const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
 		return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
@@ -127,13 +136,25 @@ export class BaseVideoParser {
 	}
 
 	private static parseButtonRenderer(data: YoutubeRawData): string {
-		let buttonRenderer;
-		try {
-			const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel
-			buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title|| likeButton.defaultButtonViewModel.buttonViewModel.title
-			return buttonRenderer
-		} catch (e) {
-			return ''
+		let likeCount;
+		if (data.toggleButtonRenderer || data.buttonRenderer) {
+			const buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
+			likeCount = (
+				buttonRenderer.defaultText?.accessibility || buttonRenderer.accessibilityData
+			).accessibilityData;
+		} else if (data.segmentedLikeDislikeButtonRenderer) {
+			const likeButton = data.segmentedLikeDislikeButtonRenderer.likeButton;
+			const buttonRenderer = likeButton.toggleButtonRenderer || likeButton.buttonRenderer;
+			likeCount = (
+				buttonRenderer.defaultText?.accessibility || buttonRenderer.accessibilityData
+			).accessibilityData;
+		} else if (data.segmentedLikeDislikeButtonViewModel) {
+			likeCount =
+				data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel
+					.toggleButtonViewModel.toggleButtonViewModel.defaultButtonViewModel
+					.buttonViewModel.accessibilityText;
 		}
+
+		return likeCount;
 	}
 }

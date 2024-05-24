@@ -1,4 +1,4 @@
-import fetch, { HeadersInit, RequestInit, Response as FetchResponse } from "node-fetch";
+import fetch, { Response as FetchResponse, HeadersInit, RequestInit } from "node-fetch";
 import { URLSearchParams } from "url";
 import {HttpsProxyAgent} from "https-proxy-agent";
 
@@ -56,16 +56,16 @@ export class HTTP {
 		this.defaultClientOptions = options.youtubeClientOptions || {};
 	}
 
-	async get(url: string, options?: Partial<Options>): Promise<Response> {
-		return await this.request(url, {
+	async get(path: string, options?: Partial<Options>): Promise<Response> {
+		return await this.request(path, {
 			...options,
 			params: { prettyPrint: "false", ...options?.params },
 			method: "GET",
 		});
 	}
 
-	async post(url: string, options?: Partial<Options>): Promise<Response> {
-		return await this.request(url, {
+	async post(path: string, options?: Partial<Options>): Promise<Response> {
+		return await this.request(path, {
 			...options,
 			method: "POST",
 			params: {
@@ -86,7 +86,7 @@ export class HTTP {
 		});
 	}
 
-	private async request(url: string, partialOptions: Partial<Options>): Promise<Response> {
+	private async request(path: string, partialOptions: Partial<Options>): Promise<Response> {
 		const options: RequestInit = {
 			...partialOptions,
 			...this.defaultFetchOptions,
@@ -101,11 +101,21 @@ export class HTTP {
 			agent: Boolean(this.proxy) ? new HttpsProxyAgent(this.proxy) :  undefined,
 		};
 
-		const finalUrl = `https://${this.baseUrl}/${url}?${new URLSearchParams(
-			partialOptions.params
-		)}`;
+		// if URL is a full URL, ignore baseUrl
+		let urlString: string;
+		if (path.startsWith("http")) {
+			const url = new URL(path);
+			for (const [key, value] of Object.entries(partialOptions.params || {})) {
+				url.searchParams.set(key, value);
+			}
+			urlString = url.toString();
+		} else {
+			urlString = `https://${this.baseUrl}/${path}?${new URLSearchParams(
+				partialOptions.params
+			)}`;
+		}
 
-		const response = await fetch(finalUrl, options);
+		const response = await fetch(urlString, options);
 		const data = await response.json();
 		this.parseCookie(response);
 
