@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="28fa68c0-5e00-4676-84d1-2bd21bef5055" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/youtube/BaseVideo/BaseVideoParser.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/youtube/BaseVideo/BaseVideoParser.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/youtube/Video/VideoParser.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/youtube/Video/VideoParser.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/package.json" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2H06Rjqcfq6op78XyrKIcBpO38I" />
+  <component name="ProjectReloadState">
+    <option name="STATE" value="1" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "ts.external.directory.path": "/home/k/Desktop/Repos/youtubei/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "/home/k/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache",
+      "/home/k/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache",
+      "/home/k/.local/share/Symbols/src"
+    ]
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="28fa68c0-5e00-4676-84d1-2bd21bef5055" name="Changes" comment="" />
+      <created>1667409647775</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1667409647775</updated>
+      <workItem from="1667409658209" duration="1770000" />
+      <workItem from="1667770965747" duration="9912000" />
+      <workItem from="1667841407880" duration="404000" />
+      <workItem from="1667855658274" duration="1770000" />
+      <workItem from="1668037220864" duration="690000" />
+      <workItem from="1679998705362" duration="6367000" />
+      <workItem from="1681814483898" duration="15000" />
+      <workItem from="1682575204901" duration="14000" />
+      <workItem from="1683099916449" duration="18321000" />
+      <workItem from="1683544949717" duration="974000" />
+      <workItem from="1683550385505" duration="677000" />
+      <workItem from="1684138209827" duration="772000" />
+      <workItem from="1686211672816" duration="1821000" />
+      <workItem from="1688417603841" duration="15442000" />
+      <workItem from="1688941484980" duration="3430000" />
+      <workItem from="1707127972404" duration="1018000" />
+      <workItem from="1707131345161" duration="573000" />
+      <workItem from="1707927708495" duration="25000" />
+      <workItem from="1711885910309" duration="2664000" />
+      <workItem from="1716532936742" duration="513000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>

@@ -52,7 +52,7 @@ export class BaseVideoParser {
 
 		// related videos
 		const secondaryContents =
-			data[3].response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
+			data.response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
 				?.results;
 
 		if (secondaryContents) {
