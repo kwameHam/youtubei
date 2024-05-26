@@ -109,10 +109,11 @@ export class BaseVideoParser {
 			(c: YoutubeRawData) => "videoSecondaryInfoRenderer" in c
 		).videoSecondaryInfoRenderer;
 		const { videoDetails, captions } = data.playerResponse;
-		return { ...secondaryInfo, ...primaryInfo, videoDetails, captions };
-		const videoDetails = data.playerResponse.videoDetails;
-		const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
-		return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
+		const microformat = data.playerResponse?.microformat?.playerMicroformatRenderer;
+		return { ...secondaryInfo, ...primaryInfo, videoDetails, captions, microformat };
+		// const videoDetails = data.playerResponse.videoDetails;
+		// const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
+		// return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
 	}
 
 	private static parseCompactRenderer(

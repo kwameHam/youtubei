@@ -65,7 +65,7 @@ export class VideoCaptions extends Base {
 		languageCode?: string,
 		translationLanguageCode?: string
 	): Promise<Caption[] | undefined> {
-		if (!languageCode) languageCode = this.client.options.youtubeClientOptions.hl;
+		if (!languageCode) languageCode = ''+this.client.options.youtubeClientOptions.hl;
 
 		const url = this.languages.find((l) => l.code.toUpperCase() === languageCode?.toUpperCase())
 			?.url;

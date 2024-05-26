@@ -6,8 +6,10 @@ import { Channel, ChannelShelf } from "./Channel";
 
 export class ChannelParser {
 	static loadChannel(target: Channel, data: YoutubeRawData): Channel {
-		let channelId, title, avatar, subscriberCountText, tvBanner, mobileBanner, banner;
+		let channelId, title, avatar, subscriberCountText, tvBanner, mobileBanner, banner, videoCount;
 		const { c4TabbedHeaderRenderer, pageHeaderRenderer } = data.header;
+		const metadata = data.metadata?.channelMetadataRenderer;
+		const microformat = data.microformat?.microformatDataRenderer;
 
 		if (c4TabbedHeaderRenderer) {
 			channelId = c4TabbedHeaderRenderer.channelId;
@@ -17,6 +19,10 @@ export class ChannelParser {
 			tvBanner = c4TabbedHeaderRenderer.tvBanner?.thumbnails;
 			mobileBanner = c4TabbedHeaderRenderer.mobileBanner.thumbnails;
 			banner = c4TabbedHeaderRenderer.banner.thumbnails;
+
+			videoCount = c4TabbedHeaderRenderer.videosCountText?.runs[0]?.text || 0
+			target.badge = (c4TabbedHeaderRenderer?.badges && c4TabbedHeaderRenderer?.badges.length > 0) ? c4TabbedHeaderRenderer.badges[0]?.metadataBadgeRenderer?.tooltip : null;
+			target.channelHandle = c4TabbedHeaderRenderer.channelHandleText?.runs[0]?.text || null
 		} else {
 			channelId =
 				data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.endpoint
@@ -38,22 +44,19 @@ export class ChannelParser {
 		target.id = channelId;
 		target.name = title;
 		target.thumbnails = new Thumbnails().load(avatar);
-		target.videoCount = 0; // data not available
+		target.videoCount = videoCount || 0;
 		target.subscriberCount = subscriberCountText;
-		if (!target.channelLink && target.channelHandle) {
-			target.channelLink = 'http://www.youtube.com/'+target.channelHandle;
-		}
-		target.channelHandle = channelHandleText?.runs[0]?.text || null;
-		target.videoCount = videosCountText?.runs[0]?.text || 0;
-		target.channelTags = data?.microformat?.microformatDataRenderer?.tags || []
-		target.description = data?.metadata?.channelMetadataRenderer?.description || tagline?.channelTaglineRenderer?.content || null;
-		target.badge = (badges && badges.length > 0)? badges[0]?.metadataBadgeRenderer?.tooltip : null;
-		target.channelLink = data?.metadata?.channelMetadataRenderer?.ownerUrls[0] || null;
-
+		target.channelLink = metadata ?  metadata.ownerUrls[0] : null
+		target.channelTags = microformat ? microformat.tags : [];
+		target.description = metadata ? metadata.description : microformat.description;
 		target.banner = new Thumbnails().load(banner || []);
 		target.tvBanner = new Thumbnails().load(tvBanner || []);
 		target.mobileBanner = new Thumbnails().load(mobileBanner || []);
 		target.shelves = ChannelParser.parseShelves(target, data);
+
+		if (!target.channelLink && target.channelHandle) {
+			target.channelLink = 'http://www.youtube.com/'+target.channelHandle;
+		}
 
 		return target;
 	}
