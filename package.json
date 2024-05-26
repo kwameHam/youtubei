@@ -1,6 +1,6 @@
 {
 	"name": "youtubei",
-	"version": "1.4.1-rc.k.17",
+	"version": "1.4.1-k.1",
 	"description": "Simple package to get information from youtube such as videos, playlists, channels, video information & comments, related videos, up next video, and more!",
 	"main": "dist/cjs/index.js",
 	"module": "dist/esm/index.js",
@@ -9,7 +9,7 @@
 		"test": "test"
 	},
 	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "3.2.0",
+		"@trivago/prettier-plugin-sort-imports": "3.4.0",
 		"@types/node": "14.14.12",
 		"@types/node-fetch": "2.6.2",
 		"@typescript-eslint/eslint-plugin": "4.9.1",
@@ -64,6 +64,6 @@
 	"dependencies": {
 		"https-proxy-agent": "^5.0.1",
 		"node-fetch": "2.6.7",
-		"protocol-buffers": "5.0.0"
+		"protobufjs": "7.2.6"
 	}
 }
