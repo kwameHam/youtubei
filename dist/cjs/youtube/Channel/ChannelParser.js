@@ -7,33 +7,32 @@ const PlaylistCompact_1 = require("../PlaylistCompact");
 const VideoCompact_1 = require("../VideoCompact");
 class ChannelParser {
     static loadChannel(target, data) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         let channelId, title, avatar, subscriberCountText, tvBanner, mobileBanner, banner, videoCount;
         const { c4TabbedHeaderRenderer, pageHeaderRenderer } = data.header;
-        const metadata = (_a = data.metadata) === null || _a === void 0 ? void 0 : _a.channelMetadataRenderer;
-        const microformat = (_b = data.microformat) === null || _b === void 0 ? void 0 : _b.microformatDataRenderer;
+        const metadata = data.metadata?.channelMetadataRenderer;
+        const microformat = data.microformat?.microformatDataRenderer;
         if (c4TabbedHeaderRenderer) {
             channelId = c4TabbedHeaderRenderer.channelId;
             title = c4TabbedHeaderRenderer.title;
-            subscriberCountText = (_c = c4TabbedHeaderRenderer.subscriberCountText) === null || _c === void 0 ? void 0 : _c.simpleText;
-            avatar = (_d = c4TabbedHeaderRenderer.avatar) === null || _d === void 0 ? void 0 : _d.thumbnails;
-            tvBanner = (_e = c4TabbedHeaderRenderer.tvBanner) === null || _e === void 0 ? void 0 : _e.thumbnails;
-            mobileBanner = c4TabbedHeaderRenderer.mobileBanner.thumbnails;
-            banner = c4TabbedHeaderRenderer.banner.thumbnails;
-            videoCount = ((_g = (_f = c4TabbedHeaderRenderer.videosCountText) === null || _f === void 0 ? void 0 : _f.runs[0]) === null || _g === void 0 ? void 0 : _g.text) || 0;
-            target.badge = ((c4TabbedHeaderRenderer === null || c4TabbedHeaderRenderer === void 0 ? void 0 : c4TabbedHeaderRenderer.badges) && (c4TabbedHeaderRenderer === null || c4TabbedHeaderRenderer === void 0 ? void 0 : c4TabbedHeaderRenderer.badges.length) > 0) ? (_j = (_h = c4TabbedHeaderRenderer.badges[0]) === null || _h === void 0 ? void 0 : _h.metadataBadgeRenderer) === null || _j === void 0 ? void 0 : _j.tooltip : null;
-            target.channelHandle = ((_l = (_k = c4TabbedHeaderRenderer.channelHandleText) === null || _k === void 0 ? void 0 : _k.runs[0]) === null || _l === void 0 ? void 0 : _l.text) || null;
+            subscriberCountText = c4TabbedHeaderRenderer.subscriberCountText?.simpleText;
+            avatar = c4TabbedHeaderRenderer.avatar?.thumbnails;
+            tvBanner = c4TabbedHeaderRenderer.tvBanner?.thumbnails;
+            mobileBanner = c4TabbedHeaderRenderer.mobileBanner?.thumbnails;
+            banner = c4TabbedHeaderRenderer.banner?.thumbnails;
+            videoCount = c4TabbedHeaderRenderer.videosCountText?.runs[0]?.text || 0;
+            target.badge = (c4TabbedHeaderRenderer?.badges && c4TabbedHeaderRenderer?.badges.length > 0) ? c4TabbedHeaderRenderer.badges[0]?.metadataBadgeRenderer?.tooltip : null;
+            target.channelHandle = c4TabbedHeaderRenderer.channelHandleText?.runs[0]?.text || null;
         }
         else {
             channelId =
                 data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.endpoint
-                    .browseEndpoint.browseId;
+                    .browseEndpoint?.browseId;
             title = pageHeaderRenderer.pageTitle;
-            const { metadata, image: imageModel, banner: bannerModel, } = pageHeaderRenderer.content.pageHeaderViewModel;
+            const { metadata, image: imageModel, banner: bannerModel, } = pageHeaderRenderer?.content?.pageHeaderViewModel;
             subscriberCountText =
-                metadata.contentMetadataViewModel.metadataRows[1].metadataParts[0].text.content;
-            avatar = imageModel.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources;
-            banner = bannerModel.imageBannerViewModel.image.sources;
+                metadata.contentMetadataViewModel?.metadataRows[1]?.metadataParts[0]?.text?.content;
+            avatar = imageModel?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources;
+            banner = bannerModel?.imageBannerViewModel?.image.sources;
         }
         target.id = channelId;
         target.name = title;
@@ -76,7 +75,7 @@ class ChannelParser {
                 .filter((i) => i !== undefined);
             const shelf = {
                 title: title.runs[0].text,
-                subtitle: subtitle === null || subtitle === void 0 ? void 0 : subtitle.simpleText,
+                subtitle: subtitle?.simpleText,
                 items,
             };
             shelves.push(shelf);

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LiveVideo = void 0;
 const events_1 = require("events");
@@ -57,27 +48,25 @@ class LiveVideo extends BaseVideo_1.BaseVideo {
         clearTimeout(this.chatRequestPoolingTimeout);
     }
     /** Start request polling */
-    pollChatContinuation() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this.client.http.post(constants_1.LIVE_CHAT_END_POINT, {
-                data: { continuation: this.chatContinuation },
-            });
-            if (!response.data.continuationContents)
-                return;
-            const chats = LiveVideoParser_1.LiveVideoParser.parseChats(response.data);
-            for (const c of chats) {
-                const chat = new Chat_1.Chat({ client: this.client }).load(c);
-                if (this.chatQueue.find((c) => c.id === chat.id))
-                    continue;
-                this.chatQueue.push(chat);
-                const timeout = chat.timestamp / 1000 - (new Date().getTime() - this.delay);
-                setTimeout(() => this.emit("chat", chat), timeout);
-            }
-            const { timeout, continuation } = LiveVideoParser_1.LiveVideoParser.parseContinuation(response.data);
-            this.timeoutMs = timeout;
-            this.chatContinuation = continuation;
-            this.chatRequestPoolingTimeout = setTimeout(() => this.pollChatContinuation(), this.timeoutMs);
+    async pollChatContinuation() {
+        const response = await this.client.http.post(constants_1.LIVE_CHAT_END_POINT, {
+            data: { continuation: this.chatContinuation },
         });
+        if (!response.data.continuationContents)
+            return;
+        const chats = LiveVideoParser_1.LiveVideoParser.parseChats(response.data);
+        for (const c of chats) {
+            const chat = new Chat_1.Chat({ client: this.client }).load(c);
+            if (this.chatQueue.find((c) => c.id === chat.id))
+                continue;
+            this.chatQueue.push(chat);
+            const timeout = chat.timestamp / 1000 - (new Date().getTime() - this.delay);
+            setTimeout(() => this.emit("chat", chat), timeout);
+        }
+        const { timeout, continuation } = LiveVideoParser_1.LiveVideoParser.parseContinuation(response.data);
+        this.timeoutMs = timeout;
+        this.chatContinuation = continuation;
+        this.chatRequestPoolingTimeout = setTimeout(() => this.pollChatContinuation(), this.timeoutMs);
     }
 }
 exports.LiveVideo = LiveVideo;

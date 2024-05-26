@@ -4,7 +4,6 @@ exports.MusicSearchResultParser = void 0;
 const MusicAllSearchResultParser_1 = require("./MusicAllSearchResultParser");
 class MusicSearchResultParser {
     static parseInitialSearchResult(data, type, client) {
-        var _a, _b;
         const contentSection = data.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.find((c) => "musicShelfRenderer" in c);
         if (!contentSection) {
             // no results
@@ -16,7 +15,7 @@ class MusicSearchResultParser {
         const { contents, continuations } = contentSection.musicShelfRenderer;
         return {
             data: MusicSearchResultParser.parseSearchResult(contents, type, client),
-            continuation: (_b = (_a = continuations === null || continuations === void 0 ? void 0 : continuations[0]) === null || _a === void 0 ? void 0 : _a.nextContinuationData) === null || _b === void 0 ? void 0 : _b.continuation,
+            continuation: continuations?.[0]?.nextContinuationData?.continuation,
         };
     }
     static parseContinuationSearchResult(data, type, client) {

@@ -4,18 +4,17 @@ exports.LiveVideoParser = void 0;
 const BaseVideo_1 = require("../BaseVideo");
 class LiveVideoParser {
     static loadLiveVideo(target, data) {
-        var _a;
         const videoInfo = BaseVideo_1.BaseVideoParser.parseRawData(data);
         target.watchingCount = +videoInfo.viewCount.videoViewCountRenderer.viewCount.runs
             .map((r) => r.text)
             .join(" ")
             .replace(/[^0-9]/g, "");
-        target.chatContinuation = (_a = data.response.contents.twoColumnWatchNextResults.conversationBar.liveChatRenderer) === null || _a === void 0 ? void 0 : _a.continuations[0].reloadContinuationData.continuation;
+        target.chatContinuation =
+            data.response.contents.twoColumnWatchNextResults.conversationBar.liveChatRenderer?.continuations[0].reloadContinuationData.continuation;
         return target;
     }
     static parseChats(data) {
-        var _a;
-        return (((_a = data.continuationContents.liveChatContinuation.actions) === null || _a === void 0 ? void 0 : _a.flatMap((a) => { var _a; return ((_a = a.addChatItemAction) === null || _a === void 0 ? void 0 : _a.item.liveChatTextMessageRenderer) || []; })) || []);
+        return (data.continuationContents.liveChatContinuation.actions?.flatMap((a) => a.addChatItemAction?.item.liveChatTextMessageRenderer || []) || []);
     }
     static parseContinuation(data) {
         const continuation = data.continuationContents.liveChatContinuation.continuations[0];

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchResult = exports.SearchEnum = void 0;
 const Continuable_1 = require("../Continuable");
@@ -97,37 +88,33 @@ class SearchResult extends Continuable_1.Continuable {
      *
      * @hidden
      */
-    search(query, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.items = [];
-            this.estimatedResults = 0;
-            const bufferParams = proto_1.SearchProto.encode(proto_1.optionsToProto(options)).finish();
-            const response = yield this.client.http.post(`${constants_1.I_END_POINT}/search`, {
-                data: {
-                    query,
-                    params: Buffer.from(bufferParams).toString("base64"),
-                },
-            });
-            this.estimatedResults = +response.data.estimatedResults;
-            if (this.estimatedResults > 0) {
-                const { data, continuation } = SearchResultParser_1.SearchResultParser.parseInitialSearchResult(response.data, this.client);
-                this.items.push(...data);
-                this.continuation = continuation;
-            }
-            return this;
+    async search(query, options) {
+        this.items = [];
+        this.estimatedResults = 0;
+        const bufferParams = proto_1.SearchProto.encode(proto_1.optionsToProto(options)).finish();
+        const response = await this.client.http.post(`${constants_1.I_END_POINT}/search`, {
+            data: {
+                query,
+                params: Buffer.from(bufferParams).toString("base64"),
+            },
         });
+        this.estimatedResults = +response.data.estimatedResults;
+        if (this.estimatedResults > 0) {
+            const { data, continuation } = SearchResultParser_1.SearchResultParser.parseInitialSearchResult(response.data, this.client);
+            this.items.push(...data);
+            this.continuation = continuation;
+        }
+        return this;
     }
-    fetch() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this.client.http.post(`${constants_1.I_END_POINT}/search`, {
-                data: { continuation: this.continuation },
-            });
-            const { data, continuation } = SearchResultParser_1.SearchResultParser.parseContinuationSearchResult(response.data, this.client);
-            return {
-                items: data,
-                continuation,
-            };
+    async fetch() {
+        const response = await this.client.http.post(`${constants_1.I_END_POINT}/search`, {
+            data: { continuation: this.continuation },
         });
+        const { data, continuation } = SearchResultParser_1.SearchResultParser.parseContinuationSearchResult(response.data, this.client);
+        return {
+            items: data,
+            continuation,
+        };
     }
 }
 exports.SearchResult = SearchResult;

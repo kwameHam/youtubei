@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -37,38 +28,64 @@ class HTTP {
         this.defaultFetchOptions = options.fetchOptions || {};
         this.defaultClientOptions = options.youtubeClientOptions || {};
     }
-    get(path, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.request(path, Object.assign(Object.assign({}, options), { params: Object.assign({ prettyPrint: "false" }, options === null || options === void 0 ? void 0 : options.params), method: "GET" }));
+    async get(path, options) {
+        return await this.request(path, {
+            ...options,
+            params: { prettyPrint: "false", ...options?.params },
+            method: "GET",
         });
     }
-    post(path, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.request(path, Object.assign(Object.assign({}, options), { method: "POST", params: Object.assign({ key: this.apiKey, prettyPrint: "false" }, options === null || options === void 0 ? void 0 : options.params), data: Object.assign({ context: {
-                        client: Object.assign({ clientName: this.clientName, clientVersion: this.clientVersion }, this.defaultClientOptions),
-                    } }, options === null || options === void 0 ? void 0 : options.data) }));
+    async post(path, options) {
+        return await this.request(path, {
+            ...options,
+            method: "POST",
+            params: {
+                key: this.apiKey,
+                prettyPrint: "false",
+                ...options?.params,
+            },
+            data: {
+                context: {
+                    client: {
+                        clientName: this.clientName,
+                        clientVersion: this.clientVersion,
+                        ...this.defaultClientOptions,
+                    },
+                },
+                ...options?.data,
+            },
         });
     }
-    request(path, partialOptions) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = Object.assign(Object.assign(Object.assign({}, partialOptions), this.defaultFetchOptions), { headers: Object.assign(Object.assign(Object.assign(Object.assign({}, this.defaultHeaders), { cookie: this.cookie, referer: `https://${this.baseUrl}/` }), partialOptions.headers), this.defaultFetchOptions.headers), body: partialOptions.data ? JSON.stringify(partialOptions.data) : undefined, agent: Boolean(this.proxy) ? new https_proxy_agent_1.HttpsProxyAgent(this.proxy) : undefined });
-            // if URL is a full URL, ignore baseUrl
-            let urlString;
-            if (path.startsWith("http")) {
-                const url = new URL(path);
-                for (const [key, value] of Object.entries(partialOptions.params || {})) {
-                    url.searchParams.set(key, value);
-                }
-                urlString = url.toString();
+    async request(path, partialOptions) {
+        const options = {
+            ...partialOptions,
+            ...this.defaultFetchOptions,
+            headers: {
+                ...this.defaultHeaders,
+                cookie: this.cookie,
+                referer: `https://${this.baseUrl}/`,
+                ...partialOptions.headers,
+                ...this.defaultFetchOptions.headers,
+            },
+            body: partialOptions.data ? JSON.stringify(partialOptions.data) : undefined,
+            agent: Boolean(this.proxy) ? new https_proxy_agent_1.HttpsProxyAgent(this.proxy) : undefined,
+        };
+        // if URL is a full URL, ignore baseUrl
+        let urlString;
+        if (path.startsWith("http")) {
+            const url = new URL(path);
+            for (const [key, value] of Object.entries(partialOptions.params || {})) {
+                url.searchParams.set(key, value);
             }
-            else {
-                urlString = `https://${this.baseUrl}/${path}?${new url_1.URLSearchParams(partialOptions.params)}`;
-            }
-            const response = yield node_fetch_1.default(urlString, options);
-            const data = yield response.json();
-            this.parseCookie(response);
-            return { data };
-        });
+            urlString = url.toString();
+        }
+        else {
+            urlString = `https://${this.baseUrl}/${path}?${new url_1.URLSearchParams(partialOptions.params)}`;
+        }
+        const response = await node_fetch_1.default(urlString, options);
+        const data = await response.json();
+        this.parseCookie(response);
+        return { data };
     }
     parseCookie(response) {
         const cookie = response.headers.get("set-cookie");

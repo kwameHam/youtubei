@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VideoCaptions = void 0;
 const Base_1 = require("../Base");
@@ -51,31 +42,28 @@ class VideoCaptions extends Base_1.Base {
     /**
      * Get captions of a specific language or a translation of a specific language
      */
-    get(languageCode, translationLanguageCode) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!languageCode)
-                languageCode = '' + this.client.options.youtubeClientOptions.hl;
-            const url = (_a = this.languages.find((l) => l.code.toUpperCase() === (languageCode === null || languageCode === void 0 ? void 0 : languageCode.toUpperCase()))) === null || _a === void 0 ? void 0 : _a.url;
-            if (!url)
-                return undefined;
-            const params = { fmt: "json3" };
-            if (translationLanguageCode)
-                params["tlang"] = translationLanguageCode;
-            const response = yield this.client.http.get(url, { params });
-            const captions = (_b = response.data.events) === null || _b === void 0 ? void 0 : _b.reduce((curr, e) => {
-                var _a;
-                if (e.segs === undefined)
-                    return curr;
-                curr.push(new Caption_1.Caption({
-                    duration: e.dDurationMs,
-                    start: e.tStartMs,
-                    text: (_a = e.segs) === null || _a === void 0 ? void 0 : _a.map((s) => Object.values(s).join("")).join(" "),
-                }));
+    async get(languageCode, translationLanguageCode) {
+        if (!languageCode)
+            languageCode = '' + this.client.options.youtubeClientOptions.hl;
+        const url = this.languages.find((l) => l.code.toUpperCase() === languageCode?.toUpperCase())
+            ?.url;
+        if (!url)
+            return undefined;
+        const params = { fmt: "json3" };
+        if (translationLanguageCode)
+            params["tlang"] = translationLanguageCode;
+        const response = await this.client.http.get(url, { params });
+        const captions = response.data.events?.reduce((curr, e) => {
+            if (e.segs === undefined)
                 return curr;
-            }, []);
-            return captions;
-        });
+            curr.push(new Caption_1.Caption({
+                duration: e.dDurationMs,
+                start: e.tStartMs,
+                text: e.segs?.map((s) => Object.values(s).join("")).join(" "),
+            }));
+            return curr;
+        }, []);
+        return captions;
     }
 }
 exports.VideoCaptions = VideoCaptions;

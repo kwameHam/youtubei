@@ -54,15 +54,19 @@ const searchSortProto = {
     view: 3,
 };
 const optionsToProto = (options) => {
-    var _a;
-    const featuresRecord = ((_a = options.features) === null || _a === void 0 ? void 0 : _a.reduce((acc, val) => {
+    const featuresRecord = options.features?.reduce((acc, val) => {
         if (val)
             acc[val] = 1;
         return acc;
-    }, {})) || {};
+    }, {}) || {};
     return {
         sortBy: options.sortBy && searchSortProto[options.sortBy],
-        options: Object.assign({ duration: options.duration && searchDurationProto[options.duration], type: options.type && searchTypeProto[options.type], uploadDate: options.uploadDate && searchUploadDateProto[options.uploadDate] }, featuresRecord),
+        options: {
+            duration: options.duration && searchDurationProto[options.duration],
+            type: options.type && searchTypeProto[options.type],
+            uploadDate: options.uploadDate && searchUploadDateProto[options.uploadDate],
+            ...featuresRecord,
+        },
     };
 };
 exports.optionsToProto = optionsToProto;

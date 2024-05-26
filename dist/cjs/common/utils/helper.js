@@ -27,7 +27,7 @@ const stripToInt = (string) => {
 exports.stripToInt = stripToInt;
 const getContinuationFromItems = (items, accessors = ["continuationEndpoint"]) => {
     const continuation = items[items.length - 1];
-    const renderer = continuation === null || continuation === void 0 ? void 0 : continuation.continuationItemRenderer;
+    const renderer = continuation?.continuationItemRenderer;
     if (!renderer)
         return;
     let current = renderer;

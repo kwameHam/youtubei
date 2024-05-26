@@ -6,13 +6,13 @@ const BaseChannel_1 = require("../BaseChannel");
 const VideoCompact_1 = require("../VideoCompact");
 class PlaylistParser {
     static loadPlaylist(target, data) {
-        var _a, _b, _c;
         const sidebarRenderer = data.sidebar.playlistSidebarRenderer.items;
         const primaryRenderer = sidebarRenderer[0].playlistSidebarPrimaryInfoRenderer;
         const metadata = data.metadata.playlistMetadataRenderer;
         // Basic information
-        target.id = (_a = Object.values(metadata)
-            .find((v) => v.includes("playlist?list="))) === null || _a === void 0 ? void 0 : _a.split("=")[1];
+        target.id = Object.values(metadata)
+            .find((v) => v.includes("playlist?list="))
+            ?.split("=")[1];
         target.title = metadata.title;
         const { playlistVideoThumbnailRenderer, playlistCustomThumbnailRenderer, } = primaryRenderer.thumbnailRenderer;
         target.thumbnails = new common_1.Thumbnails().load((playlistVideoThumbnailRenderer || playlistCustomThumbnailRenderer).thumbnail.thumbnails);
@@ -26,11 +26,11 @@ class PlaylistParser {
             target.videoCount = PlaylistParser.parseSideBarInfo(stats[0], true);
             target.lastUpdatedAt = PlaylistParser.parseSideBarInfo(stats[1], false);
         }
-        const playlistContents = ((_b = data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
+        const playlistContents = data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
             .sectionListRenderer.contents[0].itemSectionRenderer.contents[0]
-            .playlistVideoListRenderer) === null || _b === void 0 ? void 0 : _b.contents) || [];
+            .playlistVideoListRenderer?.contents || [];
         // Channel
-        const videoOwner = (_c = sidebarRenderer[1]) === null || _c === void 0 ? void 0 : _c.playlistSidebarSecondaryInfoRenderer.videoOwner;
+        const videoOwner = sidebarRenderer[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner;
         if (videoOwner) {
             const { title, thumbnail } = videoOwner.videoOwnerRenderer;
             target.channel = new BaseChannel_1.BaseChannel({
