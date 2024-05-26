@@ -5,6 +5,7 @@ const common_1 = require("../../common");
 const BaseChannel_1 = require("../BaseChannel");
 const PlaylistCompact_1 = require("../PlaylistCompact");
 const VideoCompact_1 = require("../VideoCompact");
+const VideoCaptions_1 = require("./VideoCaptions");
 class BaseVideoParser {
     static loadBaseVideo(target, data) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -51,6 +52,10 @@ class BaseVideoParser {
             target.related.items = BaseVideoParser.parseRelatedFromSecondaryContent(secondaryContents, target.client);
             target.related.continuation = common_1.getContinuationFromItems(secondaryContents);
         }
+        // captions
+        if (videoInfo.captions) {
+            target.captions = new VideoCaptions_1.VideoCaptions({ client: target.client, video: target }).load(videoInfo.captions.playerCaptionsTracklistRenderer);
+        }
         return target;
     }
     static parseRelated(data, client) {
@@ -62,6 +67,7 @@ class BaseVideoParser {
         return common_1.getContinuationFromItems(secondaryContents);
     }
     static parseRawData(data) {
+        var _a, _b;
         const contents = data.response.contents.twoColumnWatchNextResults.results.results.contents;
         const videoPrimaryInfoRenderer = contents.find((c) => "videoPrimaryInfoRenderer" in c);
         if (!videoPrimaryInfoRenderer) {
@@ -76,9 +82,12 @@ class BaseVideoParser {
         }
         const primaryInfo = videoPrimaryInfoRenderer.videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
-        const videoDetails = data.playerResponse.videoDetails;
-        const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
-        return Object.assign(Object.assign(Object.assign({}, secondaryInfo), primaryInfo), { videoDetails, microformat });
+        const { videoDetails, captions } = data.playerResponse;
+        const microformat = (_b = (_a = data.playerResponse) === null || _a === void 0 ? void 0 : _a.microformat) === null || _b === void 0 ? void 0 : _b.playerMicroformatRenderer;
+        return Object.assign(Object.assign(Object.assign({}, secondaryInfo), primaryInfo), { videoDetails, captions, microformat });
+        // const videoDetails = data.playerResponse.videoDetails;
+        // const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
+        // return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
     }
     static parseCompactRenderer(data, client) {
         if ("compactVideoRenderer" in data) {
@@ -94,15 +103,24 @@ class BaseVideoParser {
             .filter((c) => c !== undefined);
     }
     static parseButtonRenderer(data) {
-        let buttonRenderer;
-        try {
-            const likeButton = data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
-            buttonRenderer = likeButton.toggledButtonViewModel.buttonViewModel.title || likeButton.defaultButtonViewModel.buttonViewModel.title;
-            return buttonRenderer;
+        var _a, _b;
+        let likeCount;
+        if (data.toggleButtonRenderer || data.buttonRenderer) {
+            const buttonRenderer = data.toggleButtonRenderer || data.buttonRenderer;
+            likeCount = (((_a = buttonRenderer.defaultText) === null || _a === void 0 ? void 0 : _a.accessibility) || buttonRenderer.accessibilityData).accessibilityData;
         }
-        catch (e) {
-            return '';
+        else if (data.segmentedLikeDislikeButtonRenderer) {
+            const likeButton = data.segmentedLikeDislikeButtonRenderer.likeButton;
+            const buttonRenderer = likeButton.toggleButtonRenderer || likeButton.buttonRenderer;
+            likeCount = (((_b = buttonRenderer.defaultText) === null || _b === void 0 ? void 0 : _b.accessibility) || buttonRenderer.accessibilityData).accessibilityData;
         }
+        else if (data.segmentedLikeDislikeButtonViewModel) {
+            likeCount =
+                data.segmentedLikeDislikeButtonViewModel.likeButtonViewModel.likeButtonViewModel
+                    .toggleButtonViewModel.toggleButtonViewModel.defaultButtonViewModel
+                    .buttonViewModel.accessibilityText;
+        }
+        return likeCount;
     }
 }
 exports.BaseVideoParser = BaseVideoParser;

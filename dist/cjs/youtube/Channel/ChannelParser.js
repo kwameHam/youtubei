@@ -8,25 +8,48 @@ const VideoCompact_1 = require("../VideoCompact");
 class ChannelParser {
     static loadChannel(target, data) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-        const { channelId, title, avatar, subscriberCountText, badges, headerLinks, videosCountText, channelHandleText, tagline, } = data.header.c4TabbedHeaderRenderer;
+        let channelId, title, avatar, subscriberCountText, tvBanner, mobileBanner, banner, videoCount;
+        const { c4TabbedHeaderRenderer, pageHeaderRenderer } = data.header;
+        const metadata = (_a = data.metadata) === null || _a === void 0 ? void 0 : _a.channelMetadataRenderer;
+        const microformat = (_b = data.microformat) === null || _b === void 0 ? void 0 : _b.microformatDataRenderer;
+        if (c4TabbedHeaderRenderer) {
+            channelId = c4TabbedHeaderRenderer.channelId;
+            title = c4TabbedHeaderRenderer.title;
+            subscriberCountText = (_c = c4TabbedHeaderRenderer.subscriberCountText) === null || _c === void 0 ? void 0 : _c.simpleText;
+            avatar = (_d = c4TabbedHeaderRenderer.avatar) === null || _d === void 0 ? void 0 : _d.thumbnails;
+            tvBanner = (_e = c4TabbedHeaderRenderer.tvBanner) === null || _e === void 0 ? void 0 : _e.thumbnails;
+            mobileBanner = c4TabbedHeaderRenderer.mobileBanner.thumbnails;
+            banner = c4TabbedHeaderRenderer.banner.thumbnails;
+            videoCount = ((_g = (_f = c4TabbedHeaderRenderer.videosCountText) === null || _f === void 0 ? void 0 : _f.runs[0]) === null || _g === void 0 ? void 0 : _g.text) || 0;
+            target.badge = ((c4TabbedHeaderRenderer === null || c4TabbedHeaderRenderer === void 0 ? void 0 : c4TabbedHeaderRenderer.badges) && (c4TabbedHeaderRenderer === null || c4TabbedHeaderRenderer === void 0 ? void 0 : c4TabbedHeaderRenderer.badges.length) > 0) ? (_j = (_h = c4TabbedHeaderRenderer.badges[0]) === null || _h === void 0 ? void 0 : _h.metadataBadgeRenderer) === null || _j === void 0 ? void 0 : _j.tooltip : null;
+            target.channelHandle = ((_l = (_k = c4TabbedHeaderRenderer.channelHandleText) === null || _k === void 0 ? void 0 : _k.runs[0]) === null || _l === void 0 ? void 0 : _l.text) || null;
+        }
+        else {
+            channelId =
+                data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.endpoint
+                    .browseEndpoint.browseId;
+            title = pageHeaderRenderer.pageTitle;
+            const { metadata, image: imageModel, banner: bannerModel, } = pageHeaderRenderer.content.pageHeaderViewModel;
+            subscriberCountText =
+                metadata.contentMetadataViewModel.metadataRows[1].metadataParts[0].text.content;
+            avatar = imageModel.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources;
+            banner = bannerModel.imageBannerViewModel.image.sources;
+        }
         target.id = channelId;
         target.name = title;
-        target.thumbnails = new common_1.Thumbnails().load(avatar.thumbnails);
-        target.videoCount = ((_a = videosCountText === null || videosCountText === void 0 ? void 0 : videosCountText.runs[0]) === null || _a === void 0 ? void 0 : _a.text) || 0;
-        target.channelHandle = ((_b = channelHandleText === null || channelHandleText === void 0 ? void 0 : channelHandleText.runs[0]) === null || _b === void 0 ? void 0 : _b.text) || null;
-        target.badge = (badges && badges.length > 0) ? (_d = (_c = badges[0]) === null || _c === void 0 ? void 0 : _c.metadataBadgeRenderer) === null || _d === void 0 ? void 0 : _d.tooltip : null;
-        target.channelLink = ((_f = (_e = data === null || data === void 0 ? void 0 : data.metadata) === null || _e === void 0 ? void 0 : _e.channelMetadataRenderer) === null || _f === void 0 ? void 0 : _f.ownerUrls[0]) || null;
+        target.thumbnails = new common_1.Thumbnails().load(avatar);
+        target.videoCount = videoCount || 0;
+        target.subscriberCount = subscriberCountText;
+        target.channelLink = metadata ? metadata.ownerUrls[0] : null;
+        target.channelTags = microformat ? microformat.tags : [];
+        target.description = metadata ? metadata.description : microformat.description;
+        target.banner = new common_1.Thumbnails().load(banner || []);
+        target.tvBanner = new common_1.Thumbnails().load(tvBanner || []);
+        target.mobileBanner = new common_1.Thumbnails().load(mobileBanner || []);
+        target.shelves = ChannelParser.parseShelves(target, data);
         if (!target.channelLink && target.channelHandle) {
             target.channelLink = 'http://www.youtube.com/' + target.channelHandle;
         }
-        target.description = ((_h = (_g = data === null || data === void 0 ? void 0 : data.metadata) === null || _g === void 0 ? void 0 : _g.channelMetadataRenderer) === null || _h === void 0 ? void 0 : _h.description) || ((_j = tagline === null || tagline === void 0 ? void 0 : tagline.channelTaglineRenderer) === null || _j === void 0 ? void 0 : _j.content) || null;
-        target.channelTags = ((_l = (_k = data === null || data === void 0 ? void 0 : data.microformat) === null || _k === void 0 ? void 0 : _k.microformatDataRenderer) === null || _l === void 0 ? void 0 : _l.tags) || [];
-        target.subscriberCount = subscriberCountText === null || subscriberCountText === void 0 ? void 0 : subscriberCountText.simpleText;
-        const { tvBanner, mobileBanner, banner } = data.header.c4TabbedHeaderRenderer;
-        target.banner = new common_1.Thumbnails().load((banner === null || banner === void 0 ? void 0 : banner.thumbnails) || []);
-        target.tvBanner = new common_1.Thumbnails().load((tvBanner === null || tvBanner === void 0 ? void 0 : tvBanner.thumbnails) || []);
-        target.mobileBanner = new common_1.Thumbnails().load((mobileBanner === null || mobileBanner === void 0 ? void 0 : mobileBanner.thumbnails) || []);
-        target.shelves = ChannelParser.parseShelves(target, data);
         return target;
     }
     static parseShelves(target, data) {
