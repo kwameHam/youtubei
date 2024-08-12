@@ -18,16 +18,20 @@ class BaseVideoParser {
             return target;
         }
         // Basic information
-        target.id = videoInfo?.videoDetails.videoId;
-        target.title = videoInfo?.videoDetails.title;
-        target.uploadDate = videoInfo?.microformat.uploadDate || videoInfo?.dateText.simpleText;
-        target.publishDate = videoInfo?.microformat.publishDate || null;
-        target.viewCount = +videoInfo?.videoDetails.viewCount || null;
-        target.keywords = videoInfo?.videoDetails.keywords || null;
-        target.category = videoInfo?.microformat.category || null;
-        target.isFamilySafe = videoInfo?.microformat.isFamilySafe || null;
-        target.isLiveContent = videoInfo?.videoDetails.isLiveContent;
-        target.thumbnails = new common_1.Thumbnails().load(videoInfo?.videoDetails.thumbnail.thumbnails);
+        if (videoInfo?.videoDetails) {
+            target.id = videoInfo?.videoDetails?.videoId;
+            target.title = videoInfo?.videoDetails?.title;
+            target.viewCount = +videoInfo?.videoDetails?.viewCount || null;
+            target.keywords = videoInfo?.videoDetails?.keywords || null;
+            target.isLiveContent = videoInfo?.videoDetails?.isLiveContent;
+            target.thumbnails = new common_1.Thumbnails().load(videoInfo?.videoDetails.thumbnail.thumbnails);
+        }
+        if (videoInfo?.microformat) {
+            target.uploadDate = videoInfo?.microformat?.uploadDate || videoInfo?.dateText?.simpleText;
+            target.publishDate = videoInfo?.microformat?.publishDate || null;
+            target.category = videoInfo?.microformat?.category || null;
+            target.isFamilySafe = videoInfo?.microformat?.isFamilySafe || null;
+        }
         // Channel
         const { title, thumbnail, subscriberCountText } = videoInfo?.owner.videoOwnerRenderer;
         target.channel = new BaseChannel_1.BaseChannel({
@@ -46,7 +50,7 @@ class BaseVideoParser {
                 ?.map((r) => r.text.trim())
                 .filter((t) => t) || [];
         target.description =
-            videoInfo?.videoDetails.shortDescription || videoInfo?.microformat?.description?.simpleText || videoInfo?.description?.runs.map((d) => d.text).join("") || "";
+            videoInfo?.videoDetails?.shortDescription || videoInfo?.microformat?.description?.simpleText || videoInfo?.description?.runs.map((d) => d.text).join("") || "";
         // related videos
         const secondaryContents = data.response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
             ?.results;
