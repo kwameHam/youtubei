@@ -27,6 +27,7 @@ export class ChannelParser {
 			tvBanner = c4TabbedHeaderRenderer?.tvBanner?.thumbnails;
 			mobileBanner = c4TabbedHeaderRenderer?.mobileBanner?.thumbnails;
 			banner = c4TabbedHeaderRenderer?.banner?.thumbnails;
+			target.channelHandle = c4TabbedHeaderRenderer.channelHandleText?.runs[0]?.text || null
 		} else {
 			channelId =
 				data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.endpoint
@@ -48,6 +49,11 @@ export class ChannelParser {
 				?.text.content;
 			avatar = imageModel.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources;
 			banner = bannerModel?.imageBannerViewModel.image.sources;
+
+			const channelHandle = metadata.contentMetadataViewModel.metadataRows[0]?.text?.content
+			if (channelHandle && channelHandle?.includes('@')) {
+				target.channelHandle = channelHandle
+			}
 		}
 
 		target.id = channelId;
