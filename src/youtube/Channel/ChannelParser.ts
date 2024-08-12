@@ -17,8 +17,8 @@ export class ChannelParser {
 			subscriberCountText = c4TabbedHeaderRenderer.subscriberCountText?.simpleText;
 			avatar = c4TabbedHeaderRenderer.avatar?.thumbnails;
 			tvBanner = c4TabbedHeaderRenderer.tvBanner?.thumbnails;
-			mobileBanner = c4TabbedHeaderRenderer.mobileBanner.thumbnails;
-			banner = c4TabbedHeaderRenderer.banner.thumbnails;
+			mobileBanner = c4TabbedHeaderRenderer.mobileBanner?.thumbnails;
+			banner = c4TabbedHeaderRenderer.banner?.thumbnails;
 
 			videoCount = c4TabbedHeaderRenderer.videosCountText?.runs[0]?.text || 0
 			target.badge = (c4TabbedHeaderRenderer?.badges && c4TabbedHeaderRenderer?.badges.length > 0) ? c4TabbedHeaderRenderer.badges[0]?.metadataBadgeRenderer?.tooltip : null;
@@ -26,19 +26,19 @@ export class ChannelParser {
 		} else {
 			channelId =
 				data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.endpoint
-					.browseEndpoint.browseId;
+					.browseEndpoint?.browseId;
 			title = pageHeaderRenderer.pageTitle;
 
 			const {
 				metadata,
 				image: imageModel,
 				banner: bannerModel,
-			} = pageHeaderRenderer.content.pageHeaderViewModel;
+			} = pageHeaderRenderer?.content?.pageHeaderViewModel;
 
 			subscriberCountText =
-				metadata.contentMetadataViewModel.metadataRows[1].metadataParts[0].text.content;
-			avatar = imageModel.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources;
-			banner = bannerModel.imageBannerViewModel.image.sources;
+				metadata.contentMetadataViewModel?.metadataRows[1]?.metadataParts[0]?.text?.content;
+			avatar = imageModel?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources;
+			banner = bannerModel?.imageBannerViewModel?.image.sources;
 		}
 
 		target.id = channelId;
