@@ -11,7 +11,6 @@ export interface BaseChannelProperties extends BaseProperties {
 	id?: string;
 	name?: string;
 	thumbnails?: Thumbnails;
-	videoCount?: number;
 	subscriberCount?: string;
 }
 
