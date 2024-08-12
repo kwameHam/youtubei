@@ -10,7 +10,7 @@ export type ChannelShelf = Shelf<BaseChannel[] | VideoCompact[] | PlaylistCompac
 
 /** @hidden */
 interface ChannelProperties extends BaseChannelProperties {
-	videoCount?: string;
+	videoCount?: number | string;
 	banner?: Thumbnails;
 	tvBanner?: Thumbnails;
 	mobileBanner?: Thumbnails;
@@ -20,7 +20,7 @@ interface ChannelProperties extends BaseChannelProperties {
 /**  Represents a Youtube Channel */
 export class Channel extends BaseChannel implements ChannelProperties {
 	/** How many video does this channel have */
-	videoCount?: string;
+	videoCount?: number | string;
 	banner!: Thumbnails;
 	mobileBanner!: Thumbnails;
 	tvBanner!: Thumbnails;

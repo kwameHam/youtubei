@@ -13,7 +13,7 @@ export class VideoParser {
 			target.isError = true
 			return target;
 		}
-		target.duration = +videoInfo.videoDetails.lengthSeconds;
+		if(videoInfo.videoDetails)target.duration = +videoInfo.videoDetails.lengthSeconds;
 
 		const itemSectionRenderer = data.response.contents.twoColumnWatchNextResults.results.results.contents
 			.reverse()

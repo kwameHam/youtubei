@@ -22,7 +22,7 @@ export class BaseChannel extends Base implements BaseChannelProperties {
 	/** Thumbnails of this Channel */
 	thumbnails?: Thumbnails;
 	/** How many video does this channel have */
-	videoCount?: number;
+	videoCount?: number | string;
 	/** How many video does this channel have */
 	videoCountWrong?: number;
 	/** The @channel of the channel which is unique */

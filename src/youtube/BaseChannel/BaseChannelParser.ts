@@ -12,7 +12,7 @@ export class BaseChannelParser {
 	} as const;
 
 	static loadBaseChannel(target: BaseChannel, data: YoutubeRawData): BaseChannel {
-		const { channelId, title, thumbnail, subscriberCountText } = data;
+		const { channelId, title, thumbnail, subscriberCountText,videoCountText } = data;
 
 		target.id = channelId;
 		target.name = title.simpleText;
@@ -23,7 +23,7 @@ export class BaseChannelParser {
 				target.videoCountWrong = videoCountText.simpleText
 			}
 		}catch (e) {
-			
+
 		}
 		
 

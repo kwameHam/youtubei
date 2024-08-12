@@ -9,27 +9,33 @@ import { VideoCaptions } from "./VideoCaptions";
 export class BaseVideoParser {
 	static loadBaseVideo(target: BaseVideo, data: YoutubeRawData): BaseVideo {
 		const videoInfo = BaseVideoParser.parseRawData(data);
-		if (videoInfo.isDeleted) {
+		if (videoInfo?.isDeleted) {
 			target.isDeleted = true
 			return target;
-		}else if (videoInfo.isError) {
+		}else if (videoInfo?.isError) {
 			target.isError = true
 			return target;
 		}
+		
 		// Basic information
-		target.id = videoInfo.videoDetails.videoId;
-		target.title = videoInfo.videoDetails.title;
-		target.uploadDate = videoInfo.microformat.uploadDate || videoInfo.dateText.simpleText;
-		target.publishDate = videoInfo.microformat.publishDate || null;
-		target.viewCount = +videoInfo.videoDetails.viewCount || null;
-		target.keywords = videoInfo.videoDetails.keywords || null;
-		target.category = videoInfo.microformat.category || null;
-		target.isFamilySafe = videoInfo.microformat.isFamilySafe || null;
-		target.isLiveContent = videoInfo.videoDetails.isLiveContent;
-		target.thumbnails = new Thumbnails().load(videoInfo.videoDetails.thumbnail.thumbnails);
+		if (videoInfo?.videoDetails) {
+			target.id = videoInfo?.videoDetails?.videoId;
+			target.title = videoInfo?.videoDetails?.title;
+			target.viewCount = +videoInfo?.videoDetails?.viewCount || null;
+			target.keywords = videoInfo?.videoDetails?.keywords || null;
+			target.isLiveContent = videoInfo?.videoDetails?.isLiveContent;
+			target.thumbnails = new Thumbnails().load(videoInfo?.videoDetails.thumbnail.thumbnails);
+		}
+
+		if (videoInfo?.microformat) {
+			target.uploadDate = videoInfo?.microformat?.uploadDate || videoInfo?.dateText?.simpleText;
+			target.publishDate = videoInfo?.microformat?.publishDate || null;
+			target.category = videoInfo?.microformat?.category || null;
+			target.isFamilySafe = videoInfo?.microformat?.isFamilySafe || null;
+		}
 
 		// Channel
-		const { title, thumbnail, subscriberCountText } = videoInfo.owner.videoOwnerRenderer;
+		const { title, thumbnail, subscriberCountText } = videoInfo?.owner.videoOwnerRenderer;
 
 		target.channel = new BaseChannel({
 			client: target.client,
@@ -40,16 +46,16 @@ export class BaseVideoParser {
 		});
 
 		// Like Count and Dislike Count
-		const topLevelButtons = videoInfo.videoActions.menuRenderer.topLevelButtons;
+		const topLevelButtons = videoInfo?.videoActions.menuRenderer.topLevelButtons;
 		target.likeCount = stripToInt(BaseVideoParser.parseButtonRenderer(topLevelButtons[0]));
 
 		// Tags and description
 		target.tags =
-			videoInfo.superTitleLink?.runs
+			videoInfo?.superTitleLink?.runs
 				?.map((r: YoutubeRawData) => r.text.trim())
 				.filter((t: string) => t) || [];
 		target.description =
-			videoInfo.videoDetails.shortDescription || videoInfo.microformat?.description?.simpleText || videoInfo.description?.runs.map((d: Record<string, string>) => d.text).join("") || "";
+			videoInfo?.videoDetails?.shortDescription || videoInfo?.microformat?.description?.simpleText || videoInfo?.description?.runs.map((d: Record<string, string>) => d.text).join("") || "";
 
 		// related videos
 		const secondaryContents =
@@ -65,9 +71,9 @@ export class BaseVideoParser {
 		}
 
 		// captions
-		if (videoInfo.captions) {
+		if (videoInfo?.captions) {
 			target.captions = new VideoCaptions({ client: target.client, video: target }).load(
-				videoInfo.captions.playerCaptionsTracklistRenderer
+				videoInfo?.captions.playerCaptionsTracklistRenderer
 			);
 		}
 
