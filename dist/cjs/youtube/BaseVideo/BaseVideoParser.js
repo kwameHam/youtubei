@@ -9,27 +9,27 @@ const VideoCaptions_1 = require("./VideoCaptions");
 class BaseVideoParser {
     static loadBaseVideo(target, data) {
         const videoInfo = BaseVideoParser.parseRawData(data);
-        if (videoInfo.isDeleted) {
+        if (videoInfo?.isDeleted) {
             target.isDeleted = true;
             return target;
         }
-        else if (videoInfo.isError) {
+        else if (videoInfo?.isError) {
             target.isError = true;
             return target;
         }
         // Basic information
-        target.id = videoInfo.videoDetails.videoId;
-        target.title = videoInfo.videoDetails.title;
-        target.uploadDate = videoInfo.microformat.uploadDate || videoInfo.dateText.simpleText;
-        target.publishDate = videoInfo.microformat.publishDate || null;
-        target.viewCount = +videoInfo.videoDetails.viewCount || null;
-        target.keywords = videoInfo.videoDetails.keywords || null;
-        target.category = videoInfo.microformat.category || null;
-        target.isFamilySafe = videoInfo.microformat.isFamilySafe || null;
-        target.isLiveContent = videoInfo.videoDetails.isLiveContent;
-        target.thumbnails = new common_1.Thumbnails().load(videoInfo.videoDetails.thumbnail.thumbnails);
+        target.id = videoInfo?.videoDetails.videoId;
+        target.title = videoInfo?.videoDetails.title;
+        target.uploadDate = videoInfo?.microformat.uploadDate || videoInfo?.dateText.simpleText;
+        target.publishDate = videoInfo?.microformat.publishDate || null;
+        target.viewCount = +videoInfo?.videoDetails.viewCount || null;
+        target.keywords = videoInfo?.videoDetails.keywords || null;
+        target.category = videoInfo?.microformat.category || null;
+        target.isFamilySafe = videoInfo?.microformat.isFamilySafe || null;
+        target.isLiveContent = videoInfo?.videoDetails.isLiveContent;
+        target.thumbnails = new common_1.Thumbnails().load(videoInfo?.videoDetails.thumbnail.thumbnails);
         // Channel
-        const { title, thumbnail, subscriberCountText } = videoInfo.owner.videoOwnerRenderer;
+        const { title, thumbnail, subscriberCountText } = videoInfo?.owner.videoOwnerRenderer;
         target.channel = new BaseChannel_1.BaseChannel({
             client: target.client,
             id: title.runs[0].navigationEndpoint.browseEndpoint.browseId,
@@ -38,15 +38,15 @@ class BaseVideoParser {
             thumbnails: new common_1.Thumbnails().load(thumbnail.thumbnails),
         });
         // Like Count and Dislike Count
-        const topLevelButtons = videoInfo.videoActions.menuRenderer.topLevelButtons;
+        const topLevelButtons = videoInfo?.videoActions.menuRenderer.topLevelButtons;
         target.likeCount = common_1.stripToInt(BaseVideoParser.parseButtonRenderer(topLevelButtons[0]));
         // Tags and description
         target.tags =
-            videoInfo.superTitleLink?.runs
+            videoInfo?.superTitleLink?.runs
                 ?.map((r) => r.text.trim())
                 .filter((t) => t) || [];
         target.description =
-            videoInfo.videoDetails.shortDescription || videoInfo.microformat?.description?.simpleText || videoInfo.description?.runs.map((d) => d.text).join("") || "";
+            videoInfo?.videoDetails.shortDescription || videoInfo?.microformat?.description?.simpleText || videoInfo?.description?.runs.map((d) => d.text).join("") || "";
         // related videos
         const secondaryContents = data.response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
             ?.results;
@@ -55,8 +55,8 @@ class BaseVideoParser {
             target.related.continuation = common_1.getContinuationFromItems(secondaryContents);
         }
         // captions
-        if (videoInfo.captions) {
-            target.captions = new VideoCaptions_1.VideoCaptions({ client: target.client, video: target }).load(videoInfo.captions.playerCaptionsTracklistRenderer);
+        if (videoInfo?.captions) {
+            target.captions = new VideoCaptions_1.VideoCaptions({ client: target.client, video: target }).load(videoInfo?.captions.playerCaptionsTracklistRenderer);
         }
         return target;
     }
