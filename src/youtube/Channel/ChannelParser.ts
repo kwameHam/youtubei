@@ -50,7 +50,7 @@ export class ChannelParser {
 			avatar = imageModel.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources;
 			banner = bannerModel?.imageBannerViewModel.image.sources;
 
-			const channelHandle = metadata.contentMetadataViewModel.metadataRows[0]?.text?.content
+			const channelHandle = metadata.contentMetadataViewModel.metadataRows[0]?.metadataParts[0]?.text?.content
 			if (channelHandle && channelHandle?.includes('@')) {
 				target.channelHandle = channelHandle
 			}
