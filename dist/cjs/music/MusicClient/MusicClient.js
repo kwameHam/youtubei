@@ -40,6 +40,20 @@ class MusicClient {
         }
     }
     /**
+     * Searches for all video, song, album, playlist, or artist
+     *
+     * @param query The search query
+     */
+    async searchAll(query) {
+        const response = await this.http.post(`${constants_1.I_END_POINT}/search`, {
+            data: { query },
+        });
+        return {
+            top: MusicSearchResult_1.MusicAllSearchResultParser.parseTopResult(response.data, this),
+            shelves: MusicSearchResult_1.MusicAllSearchResultParser.parseSearchResult(response.data, this),
+        };
+    }
+    /**
      * Get lyrics of a song
      *
      * @param query The search query

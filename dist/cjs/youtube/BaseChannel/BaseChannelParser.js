@@ -4,11 +4,10 @@ exports.BaseChannelParser = void 0;
 const common_1 = require("../../common");
 class BaseChannelParser {
     static loadBaseChannel(target, data) {
-        const { channelId, title, thumbnail, videoCountText, subscriberCountText } = data;
+        const { channelId, title, thumbnail, subscriberCountText, videoCountText } = data;
         target.id = channelId;
         target.name = title.simpleText;
         target.thumbnails = new common_1.Thumbnails().load(thumbnail.thumbnails);
-        target.videoCount = common_1.stripToInt(videoCountText?.runs?.[0].text) || 0; // TODO this sometimes contains subscriber count for some reason
         target.subscriberCount = subscriberCountText?.simpleText;
         try {
             if (target.videoCount === 0 && videoCountText?.simpleText?.includes('subscribers')) {

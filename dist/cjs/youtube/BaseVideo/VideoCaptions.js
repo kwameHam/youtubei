@@ -59,7 +59,8 @@ class VideoCaptions extends Base_1.Base {
             curr.push(new Caption_1.Caption({
                 duration: e.dDurationMs,
                 start: e.tStartMs,
-                text: e.segs?.map((s) => Object.values(s).join("")).join(" "),
+                text: e.segs?.map((s) => s.utf8).join(),
+                segments: e.segs,
             }));
             return curr;
         }, []);

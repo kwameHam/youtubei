@@ -7,7 +7,7 @@ const PlaylistCompact_1 = require("../PlaylistCompact");
 const VideoCompact_1 = require("../VideoCompact");
 class ChannelParser {
     static loadChannel(target, data) {
-        let channelId, title, avatar, subscriberCountText, tvBanner, mobileBanner, banner, videoCount;
+        let channelId, title, avatar, subscriberCountText, videoCountText, tvBanner, mobileBanner, banner;
         const { c4TabbedHeaderRenderer, pageHeaderRenderer } = data.header;
         const metadata = data.metadata?.channelMetadataRenderer;
         const microformat = data.microformat?.microformatDataRenderer;
@@ -15,13 +15,11 @@ class ChannelParser {
             channelId = c4TabbedHeaderRenderer.channelId;
             title = c4TabbedHeaderRenderer.title;
             subscriberCountText = c4TabbedHeaderRenderer.subscriberCountText?.simpleText;
+            videoCountText = c4TabbedHeaderRenderer?.videosCountText?.runs?.[0]?.text;
             avatar = c4TabbedHeaderRenderer.avatar?.thumbnails;
-            tvBanner = c4TabbedHeaderRenderer.tvBanner?.thumbnails;
-            mobileBanner = c4TabbedHeaderRenderer.mobileBanner?.thumbnails;
-            banner = c4TabbedHeaderRenderer.banner?.thumbnails;
-            videoCount = c4TabbedHeaderRenderer.videosCountText?.runs[0]?.text || 0;
-            target.badge = (c4TabbedHeaderRenderer?.badges && c4TabbedHeaderRenderer?.badges.length > 0) ? c4TabbedHeaderRenderer.badges[0]?.metadataBadgeRenderer?.tooltip : null;
-            target.channelHandle = c4TabbedHeaderRenderer.channelHandleText?.runs[0]?.text || null;
+            tvBanner = c4TabbedHeaderRenderer?.tvBanner?.thumbnails;
+            mobileBanner = c4TabbedHeaderRenderer?.mobileBanner?.thumbnails;
+            banner = c4TabbedHeaderRenderer?.banner?.thumbnails;
         }
         else {
             channelId =
@@ -29,15 +27,17 @@ class ChannelParser {
                     .browseEndpoint?.browseId;
             title = pageHeaderRenderer.pageTitle;
             const { metadata, image: imageModel, banner: bannerModel, } = pageHeaderRenderer?.content?.pageHeaderViewModel;
-            subscriberCountText =
-                metadata.contentMetadataViewModel?.metadataRows[1]?.metadataParts[0]?.text?.content;
-            avatar = imageModel?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources;
-            banner = bannerModel?.imageBannerViewModel?.image.sources;
+            const metadataRow = metadata.contentMetadataViewModel.metadataRows[1];
+            subscriberCountText = metadataRow.metadataParts.find((m) => !m.text.styeRuns).text.content;
+            videoCountText = metadataRow.metadataParts.find((m) => m.text.styeRuns)
+                ?.text.content;
+            avatar = imageModel.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources;
+            banner = bannerModel?.imageBannerViewModel.image.sources;
         }
         target.id = channelId;
         target.name = title;
         target.thumbnails = new common_1.Thumbnails().load(avatar);
-        target.videoCount = videoCount || 0;
+        target.videoCount = videoCountText;
         target.subscriberCount = subscriberCountText;
         target.channelLink = metadata ? metadata.ownerUrls[0] : null;
         target.channelTags = microformat ? microformat.tags : [];
@@ -56,7 +56,7 @@ class ChannelParser {
         const rawShelves = data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
             .sectionListRenderer.contents;
         for (const rawShelf of rawShelves) {
-            const shelfRenderer = rawShelf.itemSectionRenderer.contents[0].shelfRenderer;
+            const shelfRenderer = rawShelf.itemSectionRenderer?.contents[0].shelfRenderer;
             if (!shelfRenderer)
                 continue;
             const { title, content, subtitle } = shelfRenderer;
