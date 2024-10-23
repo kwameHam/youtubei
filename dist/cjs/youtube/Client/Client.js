@@ -14,6 +14,7 @@ class Client {
     constructor(options = {}) {
         this.options = {
             initialCookie: "",
+            oauth: { enabled: false },
             fetchOptions: {},
             proxy: "",
             ...options,
@@ -73,12 +74,10 @@ class Client {
     }
     /** Get video information by video id or URL */
     async getVideo(videoId) {
-        const response = await this.http.get(`${constants_1.WATCH_END_POINT}`, {
-            params: { v: videoId, pbj: "1" },
-        });
-        const data = Array.isArray(response.data)
-            ? response.data.reduce((prev, curr) => ({ ...prev, ...curr }), {})
-            : response.data;
+        const nextPromise = this.http.post(`${constants_1.I_END_POINT}/next`, { data: { videoId } });
+        const playerPromise = this.http.post(`${constants_1.I_END_POINT}/player`, { data: { videoId } });
+        const [nextResponse, playerResponse] = await Promise.all([nextPromise, playerPromise]);
+        const data = { response: nextResponse.data, playerResponse: playerResponse.data };
         if (!data.response?.contents?.twoColumnWatchNextResults.results.results.contents ||
             data.playerResponse.playabilityStatus.status === "ERROR") {
             return undefined;

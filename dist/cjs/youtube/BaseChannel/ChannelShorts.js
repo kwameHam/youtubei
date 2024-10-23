@@ -35,11 +35,42 @@ class ChannelShorts extends Continuable_1.Continuable {
         });
         const items = BaseChannelParser_1.BaseChannelParser.parseTabData("shorts", response.data);
         const continuation = common_1.getContinuationFromItems(items);
-        const data = common_1.mapFilter(items, "reelItemRenderer");
+        const data = this.parseShorts(items);
         return {
             continuation,
             items: data.map((i) => new VideoCompact_1.VideoCompact({ client: this.client, channel: this.channel }).load(i)),
         };
+    }
+    parseShorts(items) {
+        const shortItems = [];
+        try {
+            for (const item of items) {
+                const short = {
+                    videoId: undefined,
+                    thumbnail: undefined,
+                    headline: {},
+                    viewCountText: { simpleText: undefined, runs: [{ text: '' }] }
+                };
+                const data = item?.shortsLockupViewModel;
+                const reelWatchEndpoint = data?.onTap?.innertubeCommand?.reelWatchEndpoint;
+                short.videoId = reelWatchEndpoint?.videoId;
+                short.thumbnail = reelWatchEndpoint?.thumbnail;
+                if (data?.overlayMetadata?.primaryText?.content)
+                    short.headline = { simpleText: data.overlayMetadata.primaryText.content };
+                if (data?.overlayMetadata?.secondaryText?.content)
+                    short.viewCountText.simpleText = data.overlayMetadata.secondaryText.content; // = { simpleText:
+                // data.overlaMetadata.secondaryText.content }
+                if (!short.videoId) {
+                    // console.log('ChannelShorts.parseShorts: parsing short failed:',item,'\n with short:',short)
+                    continue;
+                }
+                shortItems.push(short);
+            }
+        }
+        catch (e) {
+            // console.log('Error: ChannelShorts.parseShorts : parsing short failed:',e)
+        }
+        return shortItems;
     }
 }
 exports.ChannelShorts = ChannelShorts;
