@@ -52,7 +52,11 @@ class BaseVideoParser {
         target.description =
             videoInfo?.videoDetails?.shortDescription || videoInfo?.microformat?.description?.simpleText || videoInfo?.description?.runs.map((d) => d.text).join("") || "";
         // related videos
-        const secondaryContents = data.response.contents.twoColumnWatchNextResults.secondaryResults?.secondaryResults.results.find((s) => s.itemSectionRenderer).itemSectionRenderer.contents;
+        // const secondaryContents = data.response.contents.twoColumnWatchNextResults.secondaryResults?.secondaryResults.results.find(
+        // 	(s: YoutubeRawData) => s.itemSectionRenderer
+        // ).itemSectionRenderer.contents;
+        const secondaryContents = data.response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
+            ?.results;
         if (secondaryContents) {
             target.related.items = BaseVideoParser.parseRelatedFromSecondaryContent(secondaryContents, target.client);
             target.related.continuation = common_1.getContinuationFromItems(secondaryContents);
