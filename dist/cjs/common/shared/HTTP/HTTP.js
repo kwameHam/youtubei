@@ -32,6 +32,7 @@ class HTTP {
             expiresAt: null,
             ...options.oauth,
         };
+        this.pot = options.pot;
         this.authorizationPromise = null;
         this.defaultFetchOptions = options.fetchOptions || {};
         this.defaultClientOptions = options.youtubeClientOptions || {};
@@ -57,9 +58,11 @@ class HTTP {
                     client: {
                         clientName: this.clientName,
                         clientVersion: this.clientVersion,
+                        visitorData: this.pot?.visitorData,
                         ...this.defaultClientOptions,
                     },
                 },
+                serviceIntegrityDimensions: this.pot ? { poToken: this.pot.token } : undefined,
                 ...options?.data,
             },
         });

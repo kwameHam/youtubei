@@ -42,8 +42,10 @@ class BaseVideoParser {
             thumbnails: new common_1.Thumbnails().load(thumbnail.thumbnails),
         });
         // Like Count and Dislike Count
-        const topLevelButtons = videoInfo?.videoActions.menuRenderer.topLevelButtons;
-        target.likeCount = common_1.stripToInt(BaseVideoParser.parseButtonRenderer(topLevelButtons[0]));
+        const topLevelButtons = videoInfo.videoActions.menuRenderer.topLevelButtons;
+        target.likeCount = topLevelButtons
+            ? common_1.stripToInt(BaseVideoParser.parseButtonRenderer(topLevelButtons[0]))
+            : null;
         // Tags and description
         target.tags =
             videoInfo?.superTitleLink?.runs
@@ -55,8 +57,13 @@ class BaseVideoParser {
         // const secondaryContents = data.response.contents.twoColumnWatchNextResults.secondaryResults?.secondaryResults.results.find(
         // 	(s: YoutubeRawData) => s.itemSectionRenderer
         // ).itemSectionRenderer.contents;
-        const secondaryContents = data.response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
+        let secondaryContents = data.response.contents.twoColumnWatchNextResults?.secondaryResults?.secondaryResults
             ?.results;
+        const itemSectionRenderer = secondaryContents?.find((c) => {
+            return c.itemSectionRenderer;
+        })?.itemSectionRenderer;
+        if (itemSectionRenderer)
+            secondaryContents = itemSectionRenderer.contents;
         if (secondaryContents) {
             target.related.items = BaseVideoParser.parseRelatedFromSecondaryContent(secondaryContents, target.client);
             target.related.continuation = common_1.getContinuationFromItems(secondaryContents);
@@ -103,6 +110,16 @@ class BaseVideoParser {
         }
         else if ("compactRadioRenderer" in data) {
             return new PlaylistCompact_1.PlaylistCompact({ client }).load(data.compactRadioRenderer);
+        }
+        else if ("lockupViewModel" in data) {
+            // new data structure for related contents
+            const type = data.lockupViewModel.contentType;
+            if (type === "LOCKUP_CONTENT_TYPE_VIDEO") {
+                return new VideoCompact_1.VideoCompact({ client }).loadLockup(data.lockupViewModel);
+            }
+            else if (type === "LOCKUP_CONTENT_TYPE_PLAYLIST") {
+                return new PlaylistCompact_1.PlaylistCompact({ client }).loadLockup(data.lockupViewModel);
+            }
         }
     }
     static parseRelatedFromSecondaryContent(secondaryContents, client) {

@@ -43,8 +43,9 @@ class VideoCaptions extends Base_1.Base {
      * Get captions of a specific language or a translation of a specific language
      */
     async get(languageCode, translationLanguageCode) {
-        if (!languageCode)
-            languageCode = '' + this.client.options.youtubeClientOptions.hl;
+        if (!languageCode && this.client.options.youtubeClientOptions?.hl) {
+            languageCode = this.client.options.youtubeClientOptions.hl;
+        }
         const url = this.languages.find((l) => l.code.toUpperCase() === languageCode?.toUpperCase())
             ?.url;
         if (!url)

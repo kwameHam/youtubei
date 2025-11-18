@@ -9,6 +9,15 @@ const Playlist_1 = require("../Playlist");
 const SearchResult_1 = require("../SearchResult");
 const Video_1 = require("../Video");
 const constants_1 = require("../constants");
+// export type ClientOptions = {
+// 	initialCookie: string;
+// 	oauth: OAuthOptions;
+// 	/** Optional options for http client */
+// 	fetchOptions: Partial<RequestInit>;
+// 	/** Optional options passed when sending a request to youtube (context.client) */
+// 	youtubeClientOptions: Record<string, unknown>;
+// 	proxy:string;
+// };
 /** Youtube Client */
 class Client {
     constructor(options = {}) {
@@ -23,14 +32,19 @@ class Client {
                 gl: "US",
                 ...options.youtubeClientOptions,
             },
+            apiKey: options.apiKey || constants_1.INNERTUBE_API_KEY,
+            baseUrl: options.baseUrl || constants_1.BASE_URL,
+            clientName: options.clientName || constants_1.INNERTUBE_CLIENT_NAME,
+            clientVersion: options.clientVersion || constants_1.INNERTUBE_CLIENT_VERSION,
         };
-        this.http = new common_1.HTTP({
-            apiKey: constants_1.INNERTUBE_API_KEY,
-            baseUrl: constants_1.BASE_URL,
-            clientName: constants_1.INNERTUBE_CLIENT_NAME,
-            clientVersion: constants_1.INNERTUBE_CLIENT_VERSION,
-            ...this.options,
-        });
+        this.http = new common_1.HTTP(this.options);
+    }
+    get oauth() {
+        return {
+            token: this.http.oauth.token,
+            expiresAt: this.http.oauth.expiresAt,
+            refreshToken: this.http.oauth.refreshToken,
+        };
     }
     /**
      * Searches for videos / playlists / channels
@@ -109,6 +123,14 @@ class Client {
     async getVideoTranscript(videoId, languageCode) {
         const video = await this.getVideo(videoId);
         return video?.captions?.get(languageCode);
+    }
+    /**
+     * Returns this library's name and version from package.json
+     */
+    static getVersion() {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const pkg = require("../../../../package.json");
+        return { name: pkg.name, version: pkg.version };
     }
 }
 exports.Client = Client;

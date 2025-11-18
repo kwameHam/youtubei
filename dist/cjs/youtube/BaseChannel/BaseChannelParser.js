@@ -24,10 +24,13 @@ class BaseChannelParser {
             return (t.tabRenderer?.endpoint.browseEndpoint.params ===
                 BaseChannelParser.TAB_TYPE_PARAMS[name]);
         });
-        return (tab?.tabRenderer?.content?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer
-            ?.contents[0]?.gridRenderer?.items ||
-            tab?.tabRenderer?.content?.richGridRenderer?.contents?.map((c) => c?.richItemRenderer?.content || c) ||
+        return (tab?.tabRenderer.content.sectionListRenderer?.contents?.[0].itemSectionRenderer
+            .contents[0].gridRenderer?.items ||
+            tab?.tabRenderer.content?.sectionListRenderer?.contents?.[0].itemSectionRenderer
+                ?.contents ||
+            tab?.tabRenderer.content.richGridRenderer.contents.map((c) => c.richItemRenderer?.content || c) ||
             data.onResponseReceivedActions?.[0]?.appendContinuationItemsAction?.continuationItems?.map((c) => c?.richItemRenderer?.content || c) ||
+            data.onResponseReceivedEndpoints?.[0].appendContinuationItemsAction.continuationItems ||
             []);
     }
 }
@@ -37,4 +40,5 @@ BaseChannelParser.TAB_TYPE_PARAMS = {
     shorts: "EgZzaG9ydHPyBgUKA5oBAA%3D%3D",
     live: "EgdzdHJlYW1z8gYECgJ6AA%3D%3D",
     playlists: "EglwbGF5bGlzdHPyBgQKAkIA",
+    posts: "EgVwb3N0c_IGBAoCSgA%3D",
 };

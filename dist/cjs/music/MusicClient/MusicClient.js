@@ -10,6 +10,7 @@ class MusicClient {
     constructor(options = {}) {
         const fullOptions = {
             initialCookie: "",
+            oauth: { enabled: false },
             fetchOptions: {},
             ...options,
             youtubeClientOptions: {
@@ -17,14 +18,12 @@ class MusicClient {
                 gl: "US",
                 ...options.youtubeClientOptions,
             },
+            apiKey: options.apiKey || constants_1.INNERTUBE_API_KEY,
+            baseUrl: options.baseUrl || constants_1.BASE_URL,
+            clientName: options.clientName || constants_1.INNERTUBE_CLIENT_NAME,
+            clientVersion: options.clientVersion || constants_1.INNERTUBE_CLIENT_VERSION,
         };
-        this.http = new common_1.HTTP({
-            apiKey: constants_1.INNERTUBE_API_KEY,
-            baseUrl: constants_1.BASE_URL,
-            clientName: "WEB_REMIX",
-            clientVersion: constants_1.INNERTUBE_CLIENT_VERSION,
-            ...fullOptions,
-        });
+        this.http = new common_1.HTTP(fullOptions);
     }
     async search(query, type) {
         if (!type) {

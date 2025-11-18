@@ -34,7 +34,10 @@ const getContinuationFromItems = (items, accessors = ["continuationEndpoint"]) =
     for (const accessor of accessors) {
         current = current[accessor];
     }
-    return current.continuationCommand.token;
+    if (current?.commandExecutorCommand?.commands?.length) {
+        current = current.commandExecutorCommand.commands.find((cmd) => "continuationCommand" in cmd);
+    }
+    return current?.continuationCommand?.token;
 };
 exports.getContinuationFromItems = getContinuationFromItems;
 const mapFilter = (items, key) => {

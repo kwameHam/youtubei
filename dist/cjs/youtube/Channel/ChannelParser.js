@@ -7,7 +7,7 @@ const PlaylistCompact_1 = require("../PlaylistCompact");
 const VideoCompact_1 = require("../VideoCompact");
 class ChannelParser {
     static loadChannel(target, data) {
-        let channelId, title, avatar, subscriberCountText, videoCountText, tvBanner, mobileBanner, banner;
+        let channelId, title, handle, description, avatar, subscriberCountText, videoCountText, tvBanner, mobileBanner, banner;
         const { c4TabbedHeaderRenderer, pageHeaderRenderer } = data.header;
         const metadata = data.metadata?.channelMetadataRenderer;
         const microformat = data.microformat?.microformatDataRenderer;
@@ -27,13 +27,19 @@ class ChannelParser {
                 data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.endpoint
                     .browseEndpoint?.browseId;
             title = pageHeaderRenderer.pageTitle;
-            const { metadata, image: imageModel, banner: bannerModel, } = pageHeaderRenderer?.content?.pageHeaderViewModel;
-            const metadataRow = metadata.contentMetadataViewModel.metadataRows[1];
-            subscriberCountText = metadataRow.metadataParts.find((m) => !m.text.styeRuns).text.content;
-            videoCountText = metadataRow.metadataParts.find((m) => m.text.styeRuns)
-                ?.text.content;
+            const { metadata, image: imageModel, banner: bannerModel, description: descriptionModel, } = pageHeaderRenderer?.content?.pageHeaderViewModel;
+            const metadataParts = metadata.contentMetadataViewModel.metadataRows
+                .map((m) => m.metadataParts)
+                .flat();
+            const handlePart = metadataParts.find((m) => m.text.styleRuns?.some((s) => "weightLabel" in s));
+            const subscriberCountPart = metadataParts.find((m) => m.accessibilityLabel);
+            const videoCountPart = metadataParts.find((m) => m.text.styleRuns?.some((s) => "startIndex" in s));
+            handle = handlePart?.text?.content;
+            videoCountText = videoCountPart?.text.content;
+            subscriberCountText = subscriberCountPart?.text.content;
             avatar = imageModel.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources;
             banner = bannerModel?.imageBannerViewModel.image.sources;
+            description = descriptionModel?.descriptionPreviewViewModel.description.content;
             const channelHandle = metadata.contentMetadataViewModel.metadataRows[0]?.metadataParts[0]?.text?.content;
             if (channelHandle && channelHandle?.includes('@')) {
                 target.channelHandle = channelHandle;
@@ -41,6 +47,8 @@ class ChannelParser {
         }
         target.id = channelId;
         target.name = title;
+        target.handle = handle;
+        target.description = description;
         target.thumbnails = new common_1.Thumbnails().load(avatar);
         target.videoCount = videoCountText;
         target.subscriberCount = subscriberCountText;
@@ -79,7 +87,7 @@ class ChannelParser {
             })
                 .filter((i) => i !== undefined);
             const shelf = {
-                title: title.runs[0].text,
+                title: title.simpleText || title.runs[0].text,
                 subtitle: subtitle?.simpleText,
                 items,
             };

@@ -42,9 +42,20 @@ class VideoParser {
         return target;
     }
     static parseComments(data, video) {
+        const endpoints = data.onResponseReceivedEndpoints.find((c) => {
+            return (c.appendContinuationItemsAction ||
+                c.reloadContinuationItemsCommand?.slot === "RELOAD_CONTINUATION_SLOT_BODY");
+        });
+        const repliesContinuationItems = (endpoints.reloadContinuationItemsCommand || endpoints.appendContinuationItemsAction).continuationItems;
         const comments = data.frameworkUpdates.entityBatchUpdate.mutations
             .filter((m) => m.payload.commentEntityPayload)
-            .map((m) => m.payload.commentEntityPayload);
+            .map((m) => {
+            const repliesItems = repliesContinuationItems.find((r) => r.commentThreadRenderer.commentViewModel.commentKey === m.key)?.commentThreadRenderer;
+            return {
+                ...m.payload.commentEntityPayload,
+                ...repliesItems,
+            };
+        });
         return comments.map((c) => new Comment_1.Comment({ video, client: video.client }).load(c));
     }
     static parseCommentContinuation(data) {
