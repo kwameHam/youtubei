@@ -25,10 +25,6 @@ class VideoCompactParser {
                 thumbnailOverlays?.[0].thumbnailOverlayTimeStatusRenderer?.style === "LIVE";
         target.isShort =
             thumbnailOverlays?.[0].thumbnailOverlayTimeStatusRenderer?.style === "SHORTS" || false;
-        if (target.isShort) {
-            console.log('SHORT data:', data);
-            console.log('SHORT publishedTimeText:', publishedTimeText);
-        }
         // Channel
         const browseEndpoint = (ownerText || shortBylineText)?.runs[0]?.navigationEndpoint
             ?.browseEndpoint;
