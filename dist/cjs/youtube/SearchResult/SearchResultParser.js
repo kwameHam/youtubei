@@ -9,6 +9,7 @@ class SearchResultParser {
     static parseInitialSearchResult(data, client) {
         const sectionListContents = data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer
             .contents;
+        console.log(sectionListContents);
         return {
             data: SearchResultParser.parseSearchResult(sectionListContents, client),
             continuation: common_1.getContinuationFromItems(sectionListContents),

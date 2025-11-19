@@ -6,6 +6,7 @@ const BaseChannel_1 = require("../BaseChannel");
 const PlaylistCompact_1 = require("../PlaylistCompact");
 const VideoCompact_1 = require("../VideoCompact");
 const VideoCaptions_1 = require("./VideoCaptions");
+// import util from "util";
 class BaseVideoParser {
     static loadBaseVideo(target, data) {
         const videoInfo = BaseVideoParser.parseRawData(data);
@@ -26,11 +27,29 @@ class BaseVideoParser {
             target.isLiveContent = videoInfo?.videoDetails?.isLiveContent;
             target.thumbnails = new common_1.Thumbnails().load(videoInfo?.videoDetails.thumbnail.thumbnails);
         }
+        else {
+            try {
+                target.title = videoInfo?.title?.runs[0]?.text;
+                target.viewCount = videoInfo.viewCount?.videoViewCountRenderer?.viewCount?.simpleText || null;
+            }
+            catch (err) {
+                //
+            }
+        }
         if (videoInfo?.microformat) {
             target.uploadDate = videoInfo?.microformat?.uploadDate || videoInfo?.dateText?.simpleText;
             target.publishDate = videoInfo?.microformat?.publishDate || null;
             target.category = videoInfo?.microformat?.category || null;
             target.isFamilySafe = videoInfo?.microformat?.isFamilySafe || null;
+        }
+        else {
+            target.publishDate = videoInfo?.dateText?.simpleText || videoInfo?.relativeDateText?.simpleText || null;
+            // console.log('microformat missing: videoInfo.dateText',videoInfo.dateText)
+            // console.log('microformat missing: videoInfo.relativeDateText',videoInfo.relativeDateText)
+            // console.log('microformat missing: videoInfo.viewCount.videoViewCountRenderer',videoInfo.viewCount.videoViewCountRenderer)
+            // console.log('microformat missing: videoInfo.videoActions.menuRenderer',videoInfo.videoActions.menuRenderer)
+            // // console.log('microformat missing: videoInfo.title.runs',videoInfo.title.runs)
+            // console.log(util.inspect(videoInfo.videoActions.menuRenderer, {showHidden: false, depth: null}))
         }
         // Channel
         const { title, thumbnail, subscriberCountText } = videoInfo?.owner.videoOwnerRenderer;
