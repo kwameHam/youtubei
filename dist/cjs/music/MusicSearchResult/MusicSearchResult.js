@@ -36,6 +36,7 @@ class MusicSearchResult extends MusicContinuable_1.MusicContinuable {
     /** @hidden */
     constructor({ client, type }) {
         super({ client });
+        this.top = null;
         if (type)
             this.type = type;
     }
@@ -50,14 +51,17 @@ class MusicSearchResult extends MusicContinuable_1.MusicContinuable {
     async search(query, type) {
         this.items = [];
         this.type = type;
-        const bufferParams = proto_1.MusicSearchProto.encode(proto_1.optionsToProto(type)).finish();
+        let bufferParams;
+        if (type)
+            bufferParams = proto_1.MusicSearchProto.encode(proto_1.optionsToProto(type)).finish();
         const response = await this.client.http.post(`${constants_1.I_END_POINT}/search`, {
             data: {
                 query,
-                params: Buffer.from(bufferParams).toString("base64"),
+                params: bufferParams ? Buffer.from(bufferParams).toString("base64") : undefined,
             },
         });
-        const { data, continuation } = MusicSearchResultParser_1.MusicSearchResultParser.parseInitialSearchResult(response.data, type, this.client);
+        const { data, continuation } = MusicSearchResultParser_1.MusicSearchResultParser.parseInitialSearchResult(response.data, this.client);
+        this.top = MusicSearchResultParser_1.MusicSearchResultParser.parseTopResult(response.data, this.client) || null;
         this.items.push(...data);
         this.continuation = continuation;
         return this;
@@ -72,7 +76,7 @@ class MusicSearchResult extends MusicContinuable_1.MusicContinuable {
         const response = await this.client.http.post(`${constants_1.I_END_POINT}/search`, {
             data: { continuation: this.continuation },
         });
-        const { data, continuation } = MusicSearchResultParser_1.MusicSearchResultParser.parseContinuationSearchResult(response.data, this.type, this.client);
+        const { data, continuation } = MusicSearchResultParser_1.MusicSearchResultParser.parseContinuationSearchResult(response.data, this.client);
         return {
             items: data,
             continuation,

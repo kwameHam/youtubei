@@ -25,18 +25,17 @@ class MusicClient {
         };
         this.http = new common_1.HTTP(fullOptions);
     }
+    /**
+     * Searches for video, song, album, playlist, or artist
+     *
+     * @param query The search query
+     * @param type Search type
+     *
+     */
     async search(query, type) {
-        if (!type) {
-            const response = await this.http.post(`${constants_1.I_END_POINT}/search`, {
-                data: { query },
-            });
-            return MusicSearchResult_1.MusicAllSearchResultParser.parseSearchResult(response.data, this);
-        }
-        else {
-            const result = new MusicSearchResult_1.MusicSearchResult({ client: this });
-            await result.search(query, type);
-            return result;
-        }
+        const result = new MusicSearchResult_1.MusicSearchResult({ client: this });
+        await result.search(query, type);
+        return result;
     }
     /**
      * Searches for all video, song, album, playlist, or artist
@@ -44,13 +43,9 @@ class MusicClient {
      * @param query The search query
      */
     async searchAll(query) {
-        const response = await this.http.post(`${constants_1.I_END_POINT}/search`, {
-            data: { query },
-        });
-        return {
-            top: MusicSearchResult_1.MusicAllSearchResultParser.parseTopResult(response.data, this),
-            shelves: MusicSearchResult_1.MusicAllSearchResultParser.parseSearchResult(response.data, this),
-        };
+        const result = new MusicSearchResult_1.MusicSearchResult({ client: this });
+        await result.search(query);
+        return result;
     }
     /**
      * Get lyrics of a song

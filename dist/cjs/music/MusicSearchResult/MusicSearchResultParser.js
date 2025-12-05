@@ -1,41 +1,240 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MusicSearchResultParser = void 0;
-const MusicAllSearchResultParser_1 = require("./MusicAllSearchResultParser");
+const common_1 = require("../../common");
+const MusicAlbumCompact_1 = require("../MusicAlbumCompact");
+const MusicArtistCompact_1 = require("../MusicArtistCompact");
+const MusicBaseArtist_1 = require("../MusicBaseArtist");
+const MusicBaseChannel_1 = require("../MusicBaseChannel");
+const MusicPlaylistCompact_1 = require("../MusicPlaylistCompact");
+const MusicSongCompact_1 = require("../MusicSongCompact");
+const MusicVideoCompact_1 = require("../MusicVideoCompact");
 class MusicSearchResultParser {
-    static parseInitialSearchResult(data, type, client) {
-        const contentSection = data.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.find((c) => "musicShelfRenderer" in c);
-        if (!contentSection) {
+    static parseInitialSearchResult(data, client) {
+        const sectionContents = data.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content
+            .sectionListRenderer.contents;
+        const resultContents = sectionContents.find((c) => "musicShelfRenderer" in c);
+        if (!resultContents) {
             // no results
             return {
                 data: [],
                 continuation: undefined,
             };
         }
-        const { contents, continuations } = contentSection.musicShelfRenderer;
+        const { contents, continuations } = resultContents.musicShelfRenderer;
+        const result = MusicSearchResultParser.parseSearchResult(contents, client);
         return {
-            data: MusicSearchResultParser.parseSearchResult(contents, type, client),
+            data: result,
             continuation: continuations?.[0]?.nextContinuationData?.continuation,
         };
     }
-    static parseContinuationSearchResult(data, type, client) {
+    static parseContinuationSearchResult(data, client) {
         const shelf = data.continuationContents.musicShelfContinuation;
         return {
-            data: MusicSearchResultParser.parseSearchResult(shelf.contents, type, client),
+            data: MusicSearchResultParser.parseSearchResult(shelf.contents, client),
             continuation: shelf.continuations[0].nextContinuationData.continuation,
         };
     }
-    static parseSearchResult(shelfContents, type, client) {
-        const rawContents = shelfContents
-            .filter((c) => "musicResponsiveListItemRenderer" in c)
-            .map((c) => c.musicResponsiveListItemRenderer);
+    static parseTopResult(data, client) {
+        const sectionContents = data.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content
+            .sectionListRenderer.contents;
+        const topContent = sectionContents.find((c) => "musicCardShelfRenderer" in c);
+        const top = topContent?.musicCardShelfRenderer;
+        if (!top)
+            return null;
+        const { browseEndpoint, watchEndpoint } = top.title.runs[0].navigationEndpoint;
+        const id = watchEndpoint?.videoId || browseEndpoint?.browseId;
+        const type = watchEndpoint?.watchEndpointMusicSupportedConfigs.watchEndpointMusicConfig
+            .musicVideoType ||
+            browseEndpoint?.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig
+                .pageType;
+        const title = top.title.runs[0].text;
+        const thumbnail = top.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
+        let topResult;
+        if (type === "MUSIC_VIDEO_TYPE_ATV") {
+            topResult = new MusicSongCompact_1.MusicSongCompact({
+                client,
+                id,
+                title,
+                duration: common_1.getDuration(top.subtitle.runs.at(-1).text),
+                artists: this.parseArtists(top.subtitle.runs, client),
+                album: this.parseAlbum(top.subtitle.runs, client),
+                thumbnails: new common_1.Thumbnails().load(thumbnail),
+            });
+        }
+        else if (type === "MUSIC_VIDEO_TYPE_UGC" || type === "MUSIC_VIDEO_TYPE_OMV") {
+            topResult = new MusicVideoCompact_1.MusicVideoCompact({
+                client,
+                id,
+                title,
+                duration: common_1.getDuration(top.subtitle.runs.at(-1).text),
+                artists: this.parseArtists(top.subtitle.runs, client),
+                thumbnails: new common_1.Thumbnails().load(thumbnail),
+            });
+        }
+        else if (type === "MUSIC_PAGE_TYPE_ALBUM") {
+            topResult = new MusicAlbumCompact_1.MusicAlbumCompact({
+                client,
+                id,
+                title,
+                artists: this.parseArtists(top.subtitle.runs, client),
+                thumbnails: new common_1.Thumbnails().load(thumbnail),
+            });
+        }
+        else if (type === "MUSIC_PAGE_TYPE_ARTIST") {
+            topResult = new MusicArtistCompact_1.MusicArtistCompact({
+                client,
+                id,
+                name: title,
+                thumbnails: new common_1.Thumbnails().load(thumbnail),
+            });
+        }
+        else if (type === "MUSIC_PAGE_TYPE_PLAYLIST") {
+            topResult = new MusicPlaylistCompact_1.MusicPlaylistCompact({
+                client,
+                id,
+                title,
+                channel: this.parseChannel(top.subtitle.runs, client),
+                thumbnails: new common_1.Thumbnails().load(thumbnail),
+            });
+        }
+        if (!topResult)
+            return null;
+        let more = [];
+        if (top.contents) {
+            more = top.contents
+                .filter((c) => c.musicResponsiveListItemRenderer)
+                .map((c) => this.parseSearchItem(c, client));
+        }
+        return {
+            item: topResult,
+            more,
+        };
+    }
+    static parseSearchResult(shelfContents, client) {
+        const rawContents = shelfContents.filter((c) => "musicResponsiveListItemRenderer" in c);
         const contents = [];
         for (const c of rawContents) {
-            const parsed = MusicAllSearchResultParser_1.MusicAllSearchResultParser.parseVideoItem(c, type === "video" ? "MUSIC_VIDEO_TYPE_UGC" : "MUSIC_VIDEO_TYPE_ATV", client);
+            const parsed = this.parseSearchItem(c, client);
             if (parsed)
                 contents.push(parsed);
         }
         return contents;
+    }
+    static parseSearchItem(content, client) {
+        const item = content.musicResponsiveListItemRenderer;
+        const playEndpoint = item.overlay?.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer
+            .playNavigationEndpoint;
+        if (playEndpoint?.watchEndpoint) {
+            const pageType = playEndpoint.watchEndpoint.watchEndpointMusicSupportedConfigs
+                .watchEndpointMusicConfig.musicVideoType;
+            return this.parseVideoItem(item, pageType, client);
+        }
+        else if (playEndpoint?.watchPlaylistEndpoint.params) {
+            return this.parsePlaylistItem(item, client);
+        }
+        else if (playEndpoint?.watchPlaylistEndpoint) {
+            // TODO add podcast support, id starts with PL
+            if (playEndpoint.watchPlaylistEndpoint.playlistId.startsWith("OL")) {
+                return this.parseAlbumItem(item, client);
+            }
+        }
+        else {
+            return this.parseArtistItem(item, client);
+        }
+    }
+    static parseVideoItem(item, pageType, client) {
+        // TODO support other types
+        if (!["MUSIC_VIDEO_TYPE_ATV", "MUSIC_VIDEO_TYPE_UGC", "MUSIC_VIDEO_TYPE_OMV"].includes(pageType)) {
+            return;
+        }
+        const [topColumn, bottomColumn] = item.flexColumns.map((c) => c.musicResponsiveListItemFlexColumnRenderer.text.runs);
+        const id = topColumn[0].navigationEndpoint.watchEndpoint.videoId;
+        const title = topColumn[0].text;
+        const duration = common_1.getDuration(bottomColumn.at(-1).text) || undefined;
+        const thumbnails = new common_1.Thumbnails().load(item.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails);
+        const artists = this.parseArtists(bottomColumn, client);
+        if (pageType === "MUSIC_VIDEO_TYPE_ATV") {
+            return new MusicSongCompact_1.MusicSongCompact({
+                client,
+                id,
+                album: this.parseAlbum(bottomColumn, client),
+                title,
+                artists,
+                thumbnails,
+                duration,
+            });
+        }
+        else if (pageType === "MUSIC_VIDEO_TYPE_UGC" || pageType === "MUSIC_VIDEO_TYPE_OMV") {
+            return new MusicVideoCompact_1.MusicVideoCompact({ client, id, title, artists, thumbnails, duration });
+        }
+    }
+    static parsePlaylistItem(item, client) {
+        const [topColumn, bottomColumn] = item.flexColumns.map((c) => c.musicResponsiveListItemFlexColumnRenderer.text.runs);
+        const id = item.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer
+            .playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+        const title = topColumn[0].text;
+        const songCount = common_1.stripToInt(bottomColumn.at(-1).text) || undefined;
+        const thumbnails = new common_1.Thumbnails().load(item.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails);
+        const channel = this.parseChannel(bottomColumn, client);
+        return new MusicPlaylistCompact_1.MusicPlaylistCompact({ client, id, title, thumbnails, songCount, channel });
+    }
+    static parseAlbumItem(item, client) {
+        const [topColumn, bottomColumn] = item.flexColumns.map((c) => c.musicResponsiveListItemFlexColumnRenderer.text.runs);
+        const id = item.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer
+            .playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+        const title = topColumn[0].text;
+        const year = common_1.stripToInt(bottomColumn.at(-1).text) || undefined;
+        const thumbnails = new common_1.Thumbnails().load(item.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails);
+        const artists = this.parseArtists(bottomColumn, client);
+        return new MusicAlbumCompact_1.MusicAlbumCompact({ client, id, title, thumbnails, artists, year });
+    }
+    static parseArtistItem(item, client) {
+        const [topColumn] = item.flexColumns.map((c) => c.musicResponsiveListItemFlexColumnRenderer.text.runs);
+        const id = item.navigationEndpoint.browseEndpoint.browseId;
+        const name = topColumn[0].text;
+        const thumbnails = new common_1.Thumbnails().load(item.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails);
+        return new MusicArtistCompact_1.MusicArtistCompact({ client, id, name, thumbnails });
+    }
+    static parseAlbum(items, client) {
+        const albumRaw = items.find((r) => {
+            const pageType = r.navigationEndpoint?.browseEndpoint.browseEndpointContextSupportedConfigs
+                .browseEndpointContextMusicConfig.pageType;
+            return pageType === "MUSIC_PAGE_TYPE_ALBUM";
+        });
+        if (!albumRaw)
+            return;
+        const album = new MusicAlbumCompact_1.MusicAlbumCompact({
+            client,
+            title: albumRaw.text,
+            id: albumRaw.navigationEndpoint?.browseEndpoint.browseId,
+        });
+        return album;
+    }
+    static parseArtists(items, client) {
+        return this.parseArtistsOrChannel(items).map((r) => new MusicBaseArtist_1.MusicBaseArtist({
+            client,
+            name: r.text,
+            id: r.navigationEndpoint?.browseEndpoint.browseId,
+        }));
+    }
+    static parseChannel(items, client) {
+        const [channelRaw] = this.parseArtistsOrChannel(items);
+        if (!channelRaw)
+            return;
+        const channel = new MusicBaseChannel_1.MusicBaseChannel({
+            client,
+            name: channelRaw.text,
+            id: channelRaw.navigationEndpoint?.browseEndpoint.browseId,
+        });
+        return channel;
+    }
+    static parseArtistsOrChannel(items) {
+        return items.filter((i) => {
+            const pageType = i.navigationEndpoint?.browseEndpoint.browseEndpointContextSupportedConfigs
+                .browseEndpointContextMusicConfig.pageType;
+            return (pageType === "MUSIC_PAGE_TYPE_ARTIST" || pageType == "MUSIC_PAGE_TYPE_USER_CHANNEL");
+        });
     }
 }
 exports.MusicSearchResultParser = MusicSearchResultParser;

@@ -46,13 +46,33 @@ class BaseVideoParser {
         }
         // Channel
         const { title, thumbnail, subscriberCountText } = videoInfo?.owner.videoOwnerRenderer;
-        target.channel = new BaseChannel_1.BaseChannel({
-            client: target.client,
-            id: title.runs[0].navigationEndpoint.browseEndpoint.browseId,
-            name: title.runs[0].text,
-            subscriberCount: subscriberCountText?.simpleText,
-            thumbnails: new common_1.Thumbnails().load(thumbnail.thumbnails),
-        });
+        if (title) {
+            target.channel = new BaseChannel_1.BaseChannel({
+                client: target.client,
+                id: title.runs[0].navigationEndpoint.browseEndpoint.browseId,
+                name: title.runs[0].text,
+                subscriberCount: subscriberCountText?.simpleText,
+                thumbnails: new common_1.Thumbnails().load(thumbnail.thumbnails),
+            });
+        }
+        if (videoInfo.owner.videoOwnerRenderer.attributedTitle) {
+            const channelsData = videoInfo.owner.videoOwnerRenderer.attributedTitle.commandRuns[0].onTap
+                .innertubeCommand.showDialogCommand.panelLoadingStrategy.inlineContent
+                .dialogViewModel.customContent.listViewModel.listItems;
+            const avatarsData = videoInfo.owner.videoOwnerRenderer.avatarStack.avatarStackViewModel.avatars;
+            target.channels = channelsData.map((c, i) => {
+                const viewModel = c.listItemViewModel;
+                const thumbnail = avatarsData[i].avatarViewModel.image.sources;
+                return new BaseChannel_1.BaseChannel({
+                    client: target.client,
+                    id: viewModel.title.commandRuns[0].onTap.innertubeCommand.browseEndpoint
+                        .browseId,
+                    name: viewModel.title.content,
+                    subscriberCount: viewModel.subtitle.content,
+                    thumbnails: new common_1.Thumbnails().load(thumbnail),
+                });
+            });
+        }
         // Like Count and Dislike Count
         const topLevelButtons = videoInfo.videoActions.menuRenderer.topLevelButtons;
         target.likeCount = topLevelButtons
@@ -96,6 +116,7 @@ class BaseVideoParser {
     }
     static parseRawData(data) {
         const contents = data.response.contents.twoColumnWatchNextResults.results.results.contents;
+        const engagementPanelSectionListRenderer = data.response.engagementPanels?.find((c) => "engagementPanelSectionListRenderer" in c);
         const videoPrimaryInfoRenderer = contents.find((c) => "videoPrimaryInfoRenderer" in c);
         if (!videoPrimaryInfoRenderer) {
             let playabilityStatus = data.playerResponse.playabilityStatus;
@@ -111,7 +132,7 @@ class BaseVideoParser {
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
         const { videoDetails, captions } = data.playerResponse;
         const microformat = data.playerResponse?.microformat?.playerMicroformatRenderer;
-        return { ...secondaryInfo, ...primaryInfo, videoDetails, captions, microformat };
+        return { ...secondaryInfo, ...primaryInfo, videoDetails, captions, microformat, engagementPanelSectionListRenderer };
         // const videoDetails = data.playerResponse.videoDetails;
         // const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
         // return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
