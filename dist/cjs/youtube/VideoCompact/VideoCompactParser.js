@@ -47,7 +47,7 @@ class VideoCompactParser {
         const lockupMetadataViewModel = data.metadata.lockupMetadataViewModel;
         const decoratedAvatarViewModel = lockupMetadataViewModel.image.decoratedAvatarViewModel;
         const thumbnailBadge = data.contentImage.thumbnailViewModel.overlays[0].thumbnailOverlayBadgeViewModel
-            .thumbnailBadges[0].thumbnailBadgeViewModel;
+            ?.thumbnailBadges[0].thumbnailBadgeViewModel;
         const metadataRows = lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows;
         const channel = new BaseChannel_1.BaseChannel({
             client: target.client,
@@ -56,7 +56,7 @@ class VideoCompactParser {
                 .browseEndpoint.browseId,
             thumbnails: new common_1.Thumbnails().load(decoratedAvatarViewModel.avatar.avatarViewModel.image.sources),
         });
-        const isLive = thumbnailBadge.icon?.sources[0].clientResource.imageName === "LIVE";
+        const isLive = thumbnailBadge?.icon?.sources[0].clientResource.imageName === "LIVE";
         target.channel = channel;
         target.id = data.contentId;
         target.title = lockupMetadataViewModel.title.content;
