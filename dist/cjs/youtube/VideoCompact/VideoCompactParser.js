@@ -60,10 +60,11 @@ class VideoCompactParser {
         target.channel = channel;
         target.id = data.contentId;
         target.title = lockupMetadataViewModel.title.content;
-        target.isLive = thumbnailBadge.icon?.sources[0].clientResource.imageName === "LIVE";
+        target.isLive = thumbnailBadge?.icon?.sources[0].clientResource.imageName === "LIVE";
         target.duration = !isLive ? common_1.getDuration(thumbnailBadge.text) : null;
         target.thumbnails = new common_1.Thumbnails().load(data.contentImage.thumbnailViewModel.image.sources);
-        target.viewCount = common_1.stripToInt(metadataRows[1].metadataParts[0].text.content);
+        if (metadataRows[1])
+            target.viewCount = common_1.stripToInt(metadataRows[1].metadataParts[0].text.content);
         target.uploadDate = !isLive
             ? metadataRows[1].metadataParts[metadataRows[1].metadataParts.length - 1].text.content
             : undefined;
