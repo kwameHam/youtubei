@@ -42,8 +42,8 @@ class VideoParser {
         }
         target.comments.continuation = common_1.getContinuationFromItems(itemSectionRenderer?.contents || []);
         const chapters = data.response.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer
-            ?.decoratedPlayerBarRenderer.playerBar.multiMarkersPlayerBarRenderer.markersMap?.[0]
-            .value.chapters;
+            ?.decoratedPlayerBarRenderer.playerBar?.multiMarkersPlayerBarRenderer
+            .markersMap?.[0].value.chapters;
         target.chapters =
             chapters?.map(({ chapterRenderer: c }) => ({
                 title: c.title.simpleText,
