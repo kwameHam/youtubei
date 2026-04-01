@@ -17,15 +17,8 @@ class BaseVideoParser {
             target.isError = true;
             return target;
         }
-        // Basic information
-        target.id = videoInfo.videoDetails.videoId;
-        target.title = videoInfo.videoDetails.title;
-        target.uploadDate = videoInfo.dateText.simpleText;
-        target.viewCount = +videoInfo.videoDetails.viewCount || null;
-        target.isLiveContent = videoInfo.videoDetails.isLiveContent;
         target.formats = videoInfo.streamingData?.formats || [];
         target.adaptiveFormats = videoInfo.streamingData?.adaptiveFormats || [];
-        target.thumbnails = new common_1.Thumbnails().load(videoInfo.videoDetails.thumbnail.thumbnails);
         if (videoInfo?.videoDetails) {
             target.id = videoInfo?.videoDetails?.videoId;
             target.title = videoInfo?.videoDetails?.title;
@@ -53,7 +46,7 @@ class BaseVideoParser {
             target.publishDate = videoInfo?.dateText?.simpleText || videoInfo?.relativeDateText?.simpleText || null;
         }
         // Channel
-        const { title, thumbnail, subscriberCountText } = videoInfo?.owner.videoOwnerRenderer;
+        const { title, thumbnail, subscriberCountText } = videoInfo?.owner?.videoOwnerRenderer || {};
         if (title) {
             target.channel = new BaseChannel_1.BaseChannel({
                 client: target.client,
@@ -63,7 +56,7 @@ class BaseVideoParser {
                 thumbnails: new common_1.Thumbnails().load(thumbnail.thumbnails),
             });
         }
-        if (videoInfo.owner.videoOwnerRenderer.attributedTitle) {
+        if (videoInfo?.owner?.videoOwnerRenderer?.attributedTitle) {
             const channelsData = videoInfo.owner.videoOwnerRenderer.attributedTitle.commandRuns[0].onTap
                 .innertubeCommand.showDialogCommand.panelLoadingStrategy.inlineContent
                 .dialogViewModel.customContent.listViewModel.listItems;
