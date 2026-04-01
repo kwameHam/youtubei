@@ -10,7 +10,7 @@ class VideoCompactParser {
         target.title = headline
             ? headline.simpleText
             : title.simpleText || title.runs?.[0]?.text || "";
-        target.thumbnails = new common_1.Thumbnails().load(thumbnail.thumbnails);
+        target.thumbnails = new common_1.Thumbnails().load(thumbnail?.thumbnails || []);
         target.uploadDate = publishedTimeText?.simpleText;
         target.description =
             detailedMetadataSnippets?.[0].snippetText.runs
