@@ -66,8 +66,10 @@ class ChannelParser {
     }
     static parseShelves(target, data) {
         const shelves = [];
-        const rawShelves = data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
-            .sectionListRenderer.contents;
+        const rawShelves = data.contents?.twoColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content
+            ?.sectionListRenderer?.contents;
+        if (!rawShelves)
+            return shelves;
         for (const rawShelf of rawShelves) {
             const shelfRenderer = rawShelf.itemSectionRenderer?.contents[0].shelfRenderer;
             if (!shelfRenderer)

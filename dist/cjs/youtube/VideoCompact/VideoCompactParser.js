@@ -46,8 +46,9 @@ class VideoCompactParser {
     static loadLockupVideoCompact(target, data) {
         const lockupMetadataViewModel = data.metadata.lockupMetadataViewModel;
         const decoratedAvatarViewModel = lockupMetadataViewModel.image.decoratedAvatarViewModel;
-        const thumbnailBadge = data.contentImage.thumbnailViewModel.overlays[0].thumbnailOverlayBadgeViewModel
-            ?.thumbnailBadges[0].thumbnailBadgeViewModel;
+        const thumbnailOverlay = data.contentImage.thumbnailViewModel.overlays[0];
+        const thumbnailBadge = (thumbnailOverlay.thumbnailBottomOverlayViewModel?.badges[0] ||
+            thumbnailOverlay.thumbnailOverlayBadgeViewModel.thumbnailBadges[0]).thumbnailBadgeViewModel;
         const metadataRows = lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows;
         const channel = new BaseChannel_1.BaseChannel({
             client: target.client,

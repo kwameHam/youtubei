@@ -18,6 +18,14 @@ class BaseVideoParser {
             return target;
         }
         // Basic information
+        target.id = videoInfo.videoDetails.videoId;
+        target.title = videoInfo.videoDetails.title;
+        target.uploadDate = videoInfo.dateText.simpleText;
+        target.viewCount = +videoInfo.videoDetails.viewCount || null;
+        target.isLiveContent = videoInfo.videoDetails.isLiveContent;
+        target.formats = videoInfo.streamingData?.formats || [];
+        target.adaptiveFormats = videoInfo.streamingData?.adaptiveFormats || [];
+        target.thumbnails = new common_1.Thumbnails().load(videoInfo.videoDetails.thumbnail.thumbnails);
         if (videoInfo?.videoDetails) {
             target.id = videoInfo?.videoDetails?.videoId;
             target.title = videoInfo?.videoDetails?.title;
@@ -130,12 +138,9 @@ class BaseVideoParser {
         }
         const primaryInfo = videoPrimaryInfoRenderer.videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
-        const { videoDetails, captions } = data.playerResponse;
+        const { videoDetails, captions, streamingData } = data.playerResponse;
         const microformat = data.playerResponse?.microformat?.playerMicroformatRenderer;
-        return { ...secondaryInfo, ...primaryInfo, videoDetails, captions, microformat, engagementPanelSectionListRenderer };
-        // const videoDetails = data.playerResponse.videoDetails;
-        // const microformat = data.playerResponse.microformat.playerMicroformatRenderer;
-        // return { ...secondaryInfo, ...primaryInfo, videoDetails, microformat };
+        return { ...secondaryInfo, ...primaryInfo, videoDetails, captions, microformat, streamingData, engagementPanelSectionListRenderer };
     }
     static parseCompactRenderer(data, client) {
         if ("compactVideoRenderer" in data) {
