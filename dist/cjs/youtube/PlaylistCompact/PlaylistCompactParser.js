@@ -24,8 +24,8 @@ class PlaylistCompactParser {
     }
     static loadLockupPlaylistCompact(target, data) {
         const lockupMetadataViewModel = data.metadata.lockupMetadataViewModel;
-        const channelMetadata = lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows?.[0]
-            .metadataParts[0];
+        const channelMetadata = lockupMetadataViewModel.metadata?.contentMetadataViewModel?.metadataRows?.[0]
+            ?.metadataParts?.[0];
         const thumbnailViewModel = data.contentImage.collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel;
         if (channelMetadata?.text.commandRuns) {
             // not a mix
