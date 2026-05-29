@@ -17,6 +17,14 @@ class BaseVideoParser {
             target.isError = true;
             return target;
         }
+        // Basic information
+        target.id = videoInfo.currentVideoEndpoint?.watchEndpoint?.videoId;
+        target.title =
+            videoInfo.playerOverlays?.playerOverlayRenderer?.videoDetails?.playerOverlayVideoDetailsRenderer?.title?.simpleText;
+        target.viewCount =
+            common_1.stripToInt(videoInfo.viewCount?.videoViewCountRenderer?.viewCount?.simpleText) || null;
+        target.isLiveContent = !!videoInfo.videoDetails?.isLiveContent; // TODO remove dependence on player data
+        target.uploadDate = videoInfo.dateText?.simpleText;
         target.formats = videoInfo.streamingData?.formats || [];
         target.adaptiveFormats = videoInfo.streamingData?.adaptiveFormats || [];
         if (videoInfo?.videoDetails) {
@@ -25,7 +33,6 @@ class BaseVideoParser {
             target.viewCount = +videoInfo?.videoDetails?.viewCount || null;
             target.keywords = videoInfo?.videoDetails?.keywords || null;
             target.isLiveContent = videoInfo?.videoDetails?.isLiveContent;
-            target.thumbnails = new common_1.Thumbnails().load(videoInfo?.videoDetails.thumbnail.thumbnails);
         }
         else {
             try {
@@ -36,6 +43,7 @@ class BaseVideoParser {
                 //
             }
         }
+        target.thumbnails = new common_1.Thumbnails().load(videoInfo?.videoDetails?.thumbnail?.thumbnails || common_1.getThumbnailFromId(target.id));
         if (videoInfo?.microformat) {
             target.uploadDate = videoInfo?.microformat?.uploadDate || videoInfo?.dateText?.simpleText;
             target.publishDate = videoInfo?.microformat?.publishDate || null;
@@ -85,7 +93,11 @@ class BaseVideoParser {
                 ?.map((r) => r.text.trim())
                 .filter((t) => t) || [];
         target.description =
-            videoInfo?.videoDetails?.shortDescription || videoInfo?.microformat?.description?.simpleText || videoInfo?.description?.runs.map((d) => d.text).join("") || "";
+            videoInfo?.videoDetails?.shortDescription ||
+                videoInfo?.attributedDescription?.content ||
+                videoInfo?.microformat?.description?.simpleText ||
+                videoInfo?.description?.runs?.map((d) => d.text).join("") ||
+                "";
         // related videos
         // const secondaryContents = data.response.contents.twoColumnWatchNextResults.secondaryResults?.secondaryResults.results.find(
         // 	(s: YoutubeRawData) => s.itemSectionRenderer
@@ -133,7 +145,16 @@ class BaseVideoParser {
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;
         const { videoDetails, captions, streamingData } = data.playerResponse;
         const microformat = data.playerResponse?.microformat?.playerMicroformatRenderer;
-        return { ...secondaryInfo, ...primaryInfo, videoDetails, captions, microformat, streamingData, engagementPanelSectionListRenderer };
+        return {
+            ...data.response,
+            ...secondaryInfo,
+            ...primaryInfo,
+            videoDetails,
+            captions,
+            microformat,
+            streamingData,
+            engagementPanelSectionListRenderer,
+        };
     }
     static parseCompactRenderer(data, client) {
         if ("compactVideoRenderer" in data) {

@@ -93,7 +93,7 @@ class Client {
         const [nextResponse, playerResponse] = await Promise.all([nextPromise, playerPromise]);
         const data = { response: nextResponse.data, playerResponse: playerResponse.data };
         if (!data.response?.contents?.twoColumnWatchNextResults.results.results.contents ||
-            data.playerResponse.playabilityStatus.status === "ERROR") {
+            data.playerResponse?.playabilityStatus?.status === "ERROR") {
             return undefined;
         }
         return (!data.playerResponse.playabilityStatus.liveStreamability
@@ -107,15 +107,22 @@ class Client {
         });
         return response;
     }
-    /** Get channel information by channel id+ */
+    /**
+     * Get channel information by channel id.
+     *
+     * Always returns a {@link Channel}; inspect `channel.apiDataQuality`
+     * (`full` | `partial` | `unavailable` | `error`) to decide how to handle it.
+     * For `unavailable`/`error` the requested id is preserved and
+     * `channel.unavailableReason` describes why.
+     */
     async getChannel(channelId) {
         const response = await this.http.post(`${constants_1.I_END_POINT}/browse`, {
             data: { browseId: channelId },
         });
-        if (response.data.error || response.data.alerts?.shift()?.alertRenderer?.type === "ERROR") {
-            return undefined;
-        }
-        return new Channel_1.Channel({ client: this }).load(response.data);
+        const channel = new Channel_1.Channel({ client: this }).load(response.data);
+        if (!channel.id)
+            channel.id = channelId;
+        return channel;
     }
     /**
      * Get video transcript / caption by video id

@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HTTP = void 0;
+const promises_1 = __importDefault(require("fs/promises"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const url_1 = require("url");
 const https_proxy_agent_1 = require("https-proxy-agent");
@@ -36,6 +37,7 @@ class HTTP {
         this.authorizationPromise = null;
         this.defaultFetchOptions = options.fetchOptions || {};
         this.defaultClientOptions = options.youtubeClientOptions || {};
+        this.rawResponseLogPath = options.rawResponseLogPath;
     }
     async get(path, options) {
         return await this.request(path, {
@@ -68,7 +70,8 @@ class HTTP {
         });
     }
     async request(path, partialOptions) {
-        if (this.authorizationPromise)
+        const requiresAuth = new URL(`https://${this.baseUrl}/${path}`).pathname.endsWith("/player");
+        if (this.authorizationPromise && requiresAuth)
             await this.authorizationPromise;
         const options = {
             ...partialOptions,
@@ -83,12 +86,14 @@ class HTTP {
             body: partialOptions.data ? JSON.stringify(partialOptions.data) : undefined,
             agent: Boolean(this.proxy) ? new https_proxy_agent_1.HttpsProxyAgent(this.proxy) : undefined,
         };
-        if (this.oauth.enabled) {
+        if (this.oauth.enabled && requiresAuth) {
             this.authorizationPromise = this.authorize();
             await this.authorizationPromise;
             if (this.oauth.token) {
                 options.headers = {
+                    ...options.headers,
                     Authorization: `Bearer ${this.oauth.token}`,
+                    cookie: undefined,
                 };
             }
         }
@@ -106,6 +111,9 @@ class HTTP {
         }
         const response = await node_fetch_1.default(urlString, options);
         const data = await response.json();
+        if (this.rawResponseLogPath) {
+            await promises_1.default.appendFile(this.rawResponseLogPath, JSON.stringify({ url: urlString, response: data }) + "\n");
+        }
         this.parseCookie(response);
         return { data };
     }

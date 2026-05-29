@@ -21,7 +21,7 @@ class CommentParser {
             : undefined;
         // Author
         target.author = new BaseChannel_1.BaseChannel({
-            id: author.id,
+            id: author.channelId || author.id,
             name: author.displayName,
             thumbnails: new common_1.Thumbnails().load(avatar.image.sources),
             client: target.client,

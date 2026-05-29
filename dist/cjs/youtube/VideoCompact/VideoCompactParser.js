@@ -45,30 +45,41 @@ class VideoCompactParser {
     }
     static loadLockupVideoCompact(target, data) {
         const lockupMetadataViewModel = data.metadata.lockupMetadataViewModel;
-        const decoratedAvatarViewModel = lockupMetadataViewModel.image.decoratedAvatarViewModel;
-        const thumbnailOverlay = data.contentImage.thumbnailViewModel.overlays[0];
-        const thumbnailBadge = (thumbnailOverlay.thumbnailBottomOverlayViewModel?.badges[0] ||
-            thumbnailOverlay.thumbnailOverlayBadgeViewModel.thumbnailBadges[0]).thumbnailBadgeViewModel;
-        const metadataRows = lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows;
-        const channel = new BaseChannel_1.BaseChannel({
-            client: target.client,
-            name: metadataRows[0].metadataParts[0].text.content,
-            id: decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand
-                .browseEndpoint.browseId,
-            thumbnails: new common_1.Thumbnails().load(decoratedAvatarViewModel.avatar.avatarViewModel.image.sources),
-        });
-        const isLive = thumbnailBadge?.icon?.sources[0].clientResource.imageName === "LIVE";
-        target.channel = channel;
+        // Channel avatar is present in search/related lockups, but NOT in channel-tab
+        // video lockups (we're already on the channel page).
+        const decoratedAvatarViewModel = lockupMetadataViewModel.image?.decoratedAvatarViewModel;
+        const thumbnailViewModel = data.contentImage.thumbnailViewModel;
+        const thumbnailOverlay = thumbnailViewModel.overlays?.[0];
+        const thumbnailBadge = (thumbnailOverlay?.thumbnailBottomOverlayViewModel?.badges?.[0] ||
+            thumbnailOverlay?.thumbnailOverlayBadgeViewModel?.thumbnailBadges?.[0])?.thumbnailBadgeViewModel;
+        const metadataRows = lockupMetadataViewModel.metadata?.contentMetadataViewModel?.metadataRows || [];
+        // With an avatar the first row is the channel name, and views/date live in row 2.
+        // Without an avatar (channel tab) the first row already holds views/date.
+        if (decoratedAvatarViewModel) {
+            target.channel = new BaseChannel_1.BaseChannel({
+                client: target.client,
+                name: metadataRows[0]?.metadataParts?.[0]?.text?.content,
+                id: decoratedAvatarViewModel.rendererContext?.commandContext?.onTap
+                    ?.innertubeCommand?.browseEndpoint?.browseId,
+                thumbnails: new common_1.Thumbnails().load(decoratedAvatarViewModel.avatar?.avatarViewModel?.image?.sources || []),
+            });
+        }
+        const isLive = thumbnailBadge?.icon?.sources?.[0]?.clientResource?.imageName === "LIVE";
         target.id = data.contentId;
-        target.title = lockupMetadataViewModel.title.content;
-        target.isLive = thumbnailBadge?.icon?.sources[0].clientResource.imageName === "LIVE";
+        target.title = lockupMetadataViewModel.title?.content;
+        target.isLive = isLive;
         target.duration = !isLive && thumbnailBadge?.text ? common_1.getDuration(thumbnailBadge.text) : null;
-        target.thumbnails = new common_1.Thumbnails().load(data.contentImage.thumbnailViewModel.image.sources);
-        if (metadataRows[1])
-            target.viewCount = common_1.stripToInt(metadataRows[1].metadataParts[0].text.content);
-        target.uploadDate = !isLive
-            ? metadataRows[1].metadataParts[metadataRows[1].metadataParts.length - 1].text.content
-            : undefined;
+        target.thumbnails = new common_1.Thumbnails().load(thumbnailViewModel.image?.sources || []);
+        const infoRow = decoratedAvatarViewModel ? metadataRows[1] : metadataRows[0];
+        const infoParts = infoRow?.metadataParts || [];
+        const viewPart = infoParts.find((p) => /view/i.test(p?.text?.content || "")) ||
+            infoParts[0];
+        if (viewPart?.text?.content)
+            target.viewCount = common_1.stripToInt(viewPart.text.content);
+        target.uploadDate =
+            !isLive && infoParts.length
+                ? infoParts[infoParts.length - 1]?.text?.content
+                : undefined;
         return target;
     }
 }

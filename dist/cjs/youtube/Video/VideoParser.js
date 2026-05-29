@@ -7,6 +7,10 @@ const Comment_1 = require("../Comment");
 class VideoParser {
     static loadVideo(target, data) {
         const videoInfo = BaseVideo_1.BaseVideoParser.parseRawData(data);
+        const mutations = videoInfo.frameworkUpdates?.entityBatchUpdate?.mutations;
+        const lastMarkers = mutations
+            ?.find((m) => m.payload?.macroMarkersListEntity)
+            ?.payload.macroMarkersListEntity.markersList.markers.at(-1);
         if (videoInfo.isDeleted) {
             target.isDeleted = true;
             return target;
@@ -17,6 +21,9 @@ class VideoParser {
         }
         if (videoInfo.videoDetails)
             target.duration = +videoInfo.videoDetails.lengthSeconds;
+        target.duration =
+            +videoInfo.videoDetails?.lengthSeconds ||
+                (lastMarkers ? (+lastMarkers.startMillis + +lastMarkers.durationMillis) / 1000 : 0);
         const itemSectionRenderer = data.response.contents.twoColumnWatchNextResults.results.results.contents
             .reverse()
             .find((c) => c.itemSectionRenderer)?.itemSectionRenderer;

@@ -38,7 +38,10 @@ class ChannelShorts extends Continuable_1.Continuable {
         const data = this.parseShorts(items);
         return {
             continuation,
-            items: data.map((i) => new VideoCompact_1.VideoCompact({ client: this.client, channel: this.channel }).load(i)),
+            items: data.map((i) => new VideoCompact_1.VideoCompact({
+                client: this.client,
+                channel: this.channel,
+            }).load(i)),
         };
     }
     parseShorts(items) {
