@@ -128,11 +128,13 @@ class BaseVideoParser {
         return common_1.getContinuationFromItems(secondaryContents);
     }
     static parseRawData(data) {
-        const contents = data.response.contents.twoColumnWatchNextResults.results.results.contents;
-        const engagementPanelSectionListRenderer = data.response.engagementPanels?.find((c) => "engagementPanelSectionListRenderer" in c);
-        const videoPrimaryInfoRenderer = contents.find((c) => "videoPrimaryInfoRenderer" in c);
+        // Deleted / errored videos may have no watch-next contents at all, so guard
+        // every access and classify from playabilityStatus instead of throwing.
+        const contents = data.response?.contents?.twoColumnWatchNextResults?.results?.results?.contents;
+        const engagementPanelSectionListRenderer = data.response?.engagementPanels?.find((c) => "engagementPanelSectionListRenderer" in c);
+        const videoPrimaryInfoRenderer = contents?.find((c) => "videoPrimaryInfoRenderer" in c);
         if (!videoPrimaryInfoRenderer) {
-            let playabilityStatus = data.playerResponse.playabilityStatus;
+            const playabilityStatus = data.playerResponse?.playabilityStatus;
             if (playabilityStatus && playabilityStatus.status === "ERROR") {
                 if (playabilityStatus.reason === "Video nicht verfügbar") {
                     return { isDeleted: true };
@@ -140,6 +142,9 @@ class BaseVideoParser {
                 console.log('BaseVideoParser -> parseRawData error:', playabilityStatus.reason);
                 return { isError: true };
             }
+            // No primary info and no explicit error -> nothing parseable; mark as error
+            // so callers can detect it rather than crashing on missing fields.
+            return { isError: true };
         }
         const primaryInfo = videoPrimaryInfoRenderer.videoPrimaryInfoRenderer;
         const secondaryInfo = contents.find((c) => "videoSecondaryInfoRenderer" in c).videoSecondaryInfoRenderer;

@@ -92,11 +92,15 @@ class Client {
         const playerPromise = this.http.post(`${constants_1.I_END_POINT}/player`, { data: { videoId } });
         const [nextResponse, playerResponse] = await Promise.all([nextPromise, playerPromise]);
         const data = { response: nextResponse.data, playerResponse: playerResponse.data };
-        if (!data.response?.contents?.twoColumnWatchNextResults.results.results.contents ||
-            data.playerResponse?.playabilityStatus?.status === "ERROR") {
-            return undefined;
+        const playabilityStatus = data.playerResponse?.playabilityStatus;
+        const hasWatchContents = !!data.response?.contents?.twoColumnWatchNextResults?.results?.results?.contents;
+        // Unavailable / deleted / errored video (or an empty payload): still return a
+        // Video so callers can inspect `isDeleted` / `isError`. parseRawData classifies
+        // these and loadBaseVideo returns early without touching missing fields.
+        if (!hasWatchContents || playabilityStatus?.status === "ERROR") {
+            return new Video_1.Video({ client: this }).load(data);
         }
-        return (!data.playerResponse.playabilityStatus.liveStreamability
+        return (!playabilityStatus?.liveStreamability
             ? new Video_1.Video({ client: this }).load(data)
             : new LiveVideo_1.LiveVideo({ client: this }).load(data));
     }
