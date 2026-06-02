@@ -76,15 +76,21 @@ class VideoParser {
         return target;
     }
     static parseComments(data, video) {
-        const endpoints = data.onResponseReceivedEndpoints.find((c) => {
+        // Videos with comments disabled / zero comments return a response without
+        // the comment structures below, so guard every access and return [] instead
+        // of throwing (a throw would abort comment collection for the whole video).
+        const endpoints = data?.onResponseReceivedEndpoints?.find((c) => {
             return (c.appendContinuationItemsAction ||
                 c.reloadContinuationItemsCommand?.slot === "RELOAD_CONTINUATION_SLOT_BODY");
         });
-        const repliesContinuationItems = (endpoints.reloadContinuationItemsCommand || endpoints.appendContinuationItemsAction).continuationItems;
-        const comments = data.frameworkUpdates.entityBatchUpdate.mutations
-            .filter((m) => m.payload.commentEntityPayload)
+        const repliesContinuationItems = (endpoints?.reloadContinuationItemsCommand || endpoints?.appendContinuationItemsAction)?.continuationItems;
+        const mutations = data?.frameworkUpdates?.entityBatchUpdate?.mutations;
+        if (!Array.isArray(mutations))
+            return [];
+        const comments = mutations
+            .filter((m) => m.payload?.commentEntityPayload)
             .map((m) => {
-            const repliesItems = repliesContinuationItems.find((r) => r.commentThreadRenderer.commentViewModel.commentKey === m.key)?.commentThreadRenderer;
+            const repliesItems = repliesContinuationItems?.find((r) => r.commentThreadRenderer?.commentViewModel?.commentKey === m.key)?.commentThreadRenderer;
             return {
                 ...m.payload.commentEntityPayload,
                 ...repliesItems,
@@ -93,8 +99,8 @@ class VideoParser {
         return comments.map((c) => new Comment_1.Comment({ video, client: video.client }).load(c));
     }
     static parseCommentContinuation(data) {
-        const endpoints = data.onResponseReceivedEndpoints.at(-1);
-        const continuationItems = (endpoints.reloadContinuationItemsCommand || endpoints.appendContinuationItemsAction).continuationItems;
+        const endpoints = data?.onResponseReceivedEndpoints?.at(-1);
+        const continuationItems = (endpoints?.reloadContinuationItemsCommand || endpoints?.appendContinuationItemsAction)?.continuationItems;
         return common_1.getContinuationFromItems(continuationItems);
     }
 }
