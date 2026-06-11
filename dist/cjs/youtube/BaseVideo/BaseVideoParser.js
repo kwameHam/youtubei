@@ -37,7 +37,9 @@ class BaseVideoParser {
         else {
             try {
                 target.title = videoInfo?.title?.runs[0]?.text;
-                target.viewCount = videoInfo.viewCount?.videoViewCountRenderer?.viewCount?.simpleText || null;
+                // When the /player response lacks videoDetails we fall back to the /next
+                target.viewCount =
+                    common_1.stripToInt(videoInfo.viewCount?.videoViewCountRenderer?.viewCount?.simpleText) || null;
             }
             catch (err) {
                 //

@@ -77,8 +77,6 @@ class VideoParser {
     }
     static parseComments(data, video) {
         // Videos with comments disabled / zero comments return a response without
-        // the comment structures below, so guard every access and return [] instead
-        // of throwing (a throw would abort comment collection for the whole video).
         const endpoints = data?.onResponseReceivedEndpoints?.find((c) => {
             return (c.appendContinuationItemsAction ||
                 c.reloadContinuationItemsCommand?.slot === "RELOAD_CONTINUATION_SLOT_BODY");
