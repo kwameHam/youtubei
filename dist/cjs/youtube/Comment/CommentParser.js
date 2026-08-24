@@ -19,11 +19,15 @@ class CommentParser {
         target.replies.continuation = data.replies
             ? common_1.getContinuationFromItems(data.replies.commentRepliesRenderer.contents)
             : undefined;
-        // Author
+        // Author — the commentEntityPayload dropped the avatar object (2026);
+        // the thumbnail now lives at author.avatarThumbnailUrl.
         target.author = new BaseChannel_1.BaseChannel({
             id: author.channelId || author.id,
             name: author.displayName,
-            thumbnails: new common_1.Thumbnails().load(avatar.image.sources),
+            thumbnails: new common_1.Thumbnails().load(avatar?.image?.sources ||
+                (author?.avatarThumbnailUrl
+                    ? [{ url: author.avatarThumbnailUrl, width: 88, height: 88 }]
+                    : [])),
             client: target.client,
         });
         return target;

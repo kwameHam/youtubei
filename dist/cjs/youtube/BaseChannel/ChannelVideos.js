@@ -35,6 +35,10 @@ class ChannelVideos extends Continuable_1.Continuable {
         });
         const items = BaseChannelParser_1.BaseChannelParser.parseTabData("videos", response.data);
         const continuation = common_1.getContinuationFromItems(items);
+        // Keep the fork's delegation to VideoCompact.loadLockup: it parses channel-tab
+        // lockups defensively (upcoming/premiere aware, uploadDate, no-avatar layout)
+        // where upstream's inline version stripToInt's whatever sits in the first
+        // metadata part — the exact premiere-date-as-viewCount bug.
         const videos = items
             .map((i) => {
             if (i.videoRenderer)

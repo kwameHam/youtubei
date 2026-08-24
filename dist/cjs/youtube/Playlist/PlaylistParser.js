@@ -27,11 +27,10 @@ class PlaylistParser {
             target.lastUpdatedAt = PlaylistParser.parseSideBarInfo(stats[1], false);
         }
         const playlistContents = data.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
-            .sectionListRenderer.contents[0].itemSectionRenderer.contents[0]
-            .playlistVideoListRenderer?.contents || [];
+            .sectionListRenderer.contents[0].itemSectionRenderer.contents || [];
         // Channel
         const videoOwner = sidebarRenderer[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner;
-        if (videoOwner) {
+        if (videoOwner?.videoOwnerRenderer.title.runs) {
             const { title, thumbnail } = videoOwner.videoOwnerRenderer;
             target.channel = new BaseChannel_1.BaseChannel({
                 id: title.runs[0].navigationEndpoint.browseEndpoint.browseId,
@@ -40,9 +39,12 @@ class PlaylistParser {
                 client: target.client,
             });
         }
+        const playlistContentRenderer = playlistContents[0].playlistVideoListRenderer
+            ? playlistContents[0].playlistVideoListRenderer.contents
+            : playlistContents;
         // Videos
-        target.videos.items = PlaylistParser.parseVideos(playlistContents, target);
-        target.videos.continuation = common_1.getContinuationFromItems(playlistContents);
+        target.videos.items = PlaylistParser.parseVideos(playlistContentRenderer, target);
+        target.videos.continuation = common_1.getContinuationFromItems(playlistContentRenderer);
         return target;
     }
     static parseVideoContinuation(data) {
@@ -51,8 +53,20 @@ class PlaylistParser {
     }
     static parseContinuationVideos(data, client) {
         const playlistContents = data.onResponseReceivedActions[0].appendContinuationItemsAction.continuationItems;
-        const videos = common_1.mapFilter(playlistContents, "playlistVideoRenderer");
-        return videos.map((video) => new VideoCompact_1.VideoCompact({ client }).load(video));
+        const videos = [];
+        for (const content of playlistContents) {
+            let video;
+            if (content.lockupViewModel) {
+                video = new VideoCompact_1.VideoCompact({ client }).loadLockup(content.lockupViewModel);
+            }
+            else if (content.playlistVideoRenderer) {
+                video = new VideoCompact_1.VideoCompact({ client }).load(content.playlistVideoRenderer);
+            }
+            if (!video)
+                continue;
+            videos.push(video);
+        }
+        return videos;
     }
     /**
      * Get compact videos
@@ -60,12 +74,17 @@ class PlaylistParser {
      * @param playlistContents raw object from youtubei
      */
     static parseVideos(playlistContents, playlist) {
-        const videosRenderer = playlistContents.map((c) => c.playlistVideoRenderer);
         const videos = [];
-        for (const videoRenderer of videosRenderer) {
-            if (!videoRenderer)
+        for (const content of playlistContents) {
+            let video;
+            if (content.lockupViewModel) {
+                video = new VideoCompact_1.VideoCompact({ client: playlist.client }).loadLockup(content.lockupViewModel);
+            }
+            else if (content.playlistVideoRenderer) {
+                video = new VideoCompact_1.VideoCompact({ client: playlist.client }).load(content.playlistVideoRenderer);
+            }
+            if (!video)
                 continue;
-            const video = new VideoCompact_1.VideoCompact({ client: playlist.client }).load(videoRenderer);
             videos.push(video);
         }
         return videos;

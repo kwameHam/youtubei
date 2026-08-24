@@ -35,10 +35,28 @@ class ChannelLive extends Continuable_1.Continuable {
         });
         const items = BaseChannelParser_1.BaseChannelParser.parseTabData("live", response.data);
         const continuation = common_1.getContinuationFromItems(items);
-        const data = common_1.mapFilter(items, "videoRenderer");
+        // Same delegation as ChannelVideos: VideoCompact.loadLockup keeps page order,
+        // sets uploadDate, detects upcoming streams (whose lockups carry the scheduled
+        // start where an aired stream carries its view count — upstream's inline
+        // stripToInt turned "Scheduled for 8/31/26, 4:00 PM" into a view count).
+        const videos = items
+            .map((i) => {
+            if (i.videoRenderer)
+                return new VideoCompact_1.VideoCompact({
+                    client: this.client,
+                    channel: this.channel,
+                }).load(i.videoRenderer);
+            if (i.lockupViewModel?.contentType === "LOCKUP_CONTENT_TYPE_VIDEO")
+                return new VideoCompact_1.VideoCompact({
+                    client: this.client,
+                    channel: this.channel,
+                }).loadLockup(i.lockupViewModel);
+            return undefined;
+        })
+            .filter((v) => v !== undefined);
         return {
             continuation,
-            items: data.map((i) => new VideoCompact_1.VideoCompact({ client: this.client, channel: this.channel }).load(i)),
+            items: videos,
         };
     }
 }

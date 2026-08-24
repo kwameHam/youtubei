@@ -29,17 +29,23 @@ const getContinuationFromItems = (items, accessors = ["continuationEndpoint"]) =
     if (!Array.isArray(items) || items.length === 0)
         return;
     const continuation = items[items.length - 1];
-    const renderer = continuation?.continuationItemRenderer;
-    if (!renderer)
+    if (continuation?.continuationItemRenderer) {
+        let current = continuation.continuationItemRenderer;
+        for (const accessor of accessors) {
+            current = current[accessor];
+        }
+        if (current?.commandExecutorCommand?.commands?.length) {
+            current = current.commandExecutorCommand.commands.find((cmd) => "continuationCommand" in cmd);
+        }
+        return current?.continuationCommand?.token;
+    }
+    else if (continuation?.continuationItemViewModel) {
+        return continuation.continuationItemViewModel.continuationCommand?.innertubeCommand
+            ?.continuationCommand?.token;
+    }
+    else {
         return;
-    let current = renderer;
-    for (const accessor of accessors) {
-        current = current[accessor];
     }
-    if (current?.commandExecutorCommand?.commands?.length) {
-        current = current.commandExecutorCommand.commands.find((cmd) => "continuationCommand" in cmd);
-    }
-    return current?.continuationCommand?.token;
 };
 exports.getContinuationFromItems = getContinuationFromItems;
 const mapFilter = (items, key) => {
