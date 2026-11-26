@@ -8,6 +8,11 @@ const VideoCompact_1 = require("../VideoCompact");
 const VideoCaptions_1 = require("./VideoCaptions");
 class BaseVideoParser {
     static loadBaseVideo(target, data) {
+        const playabilityStatus = data?.playerResponse?.playabilityStatus;
+        if (playabilityStatus?.status && !["OK", "LIVE_STREAM_OFFLINE"].includes(playabilityStatus.status)) {
+            target.unavailableReason = playabilityStatus.reason || null;
+            target.unavailableCode = BaseVideoParser.unavailableCode(playabilityStatus);
+        }
         const videoInfo = BaseVideoParser.parseRawData(data);
         if (videoInfo?.isDeleted) {
             target.isDeleted = true;
@@ -122,12 +127,36 @@ class BaseVideoParser {
         return target;
     }
     static parseRelated(data, client) {
-        const secondaryContents = data.onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems;
+        const secondaryContents = data.onResponseReceivedEndpoints?.[0].appendContinuationItemsAction.continuationItems || [];
         return BaseVideoParser.parseRelatedFromSecondaryContent(secondaryContents, client);
     }
     static parseContinuation(data) {
-        const secondaryContents = data.onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems;
+        const secondaryContents = data.onResponseReceivedEndpoints?.[0].appendContinuationItemsAction.continuationItems;
         return common_1.getContinuationFromItems(secondaryContents);
+    }
+    /** Classify a non-OK playabilityStatus: language-independent markers first, English text last. */
+    static unavailableCode(ps) {
+        const iv = ps.errorScreen?.playerInterstitialRenderer?.content?.interstitialViewModel;
+        const url = iv?.primaryButton?.buttonViewModel?.onTap?.innertubeCommand?.urlEndpoint?.url;
+        const text = `${ps.reason} ${iv?.description?.content}`;
+        if (ps.status === "LOGIN_REQUIRED") {
+            if (ps.desktopLegacyAgeGateReason)
+                return "age_restricted";
+            return ps.messages ? "private" : "login_required";
+        }
+        if (ps.errorScreen?.playerLegacyDesktopYpcOfferRenderer)
+            return "members_only";
+        if (url === "/t/community_guidelines")
+            return "removed_community_guidelines";
+        if (url === "/t/terms")
+            return "removed_terms_of_service";
+        if (/removed for violating YouTube.s policy/i.test(text))
+            return "removed_community_guidelines";
+        if (/removed by the uploader/i.test(text))
+            return "removed_by_uploader";
+        if (/account associated with this video has been terminated/i.test(text))
+            return "owner_terminated";
+        return ps.status === "ERROR" ? "unavailable" : "unplayable";
     }
     static parseRawData(data) {
         // Deleted / errored videos may have no watch-next contents at all, so guard

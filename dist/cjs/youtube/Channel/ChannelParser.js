@@ -12,6 +12,7 @@ class ChannelParser {
             target.apiDataQuality = "error";
             target.unavailableReason = data.error.message || "request error";
             target.unavailableType = "error";
+            target.unavailableCode = "request_error";
             return target;
         }
         // Channel does not exist / terminated -> surfaced as an ERROR alert
@@ -24,6 +25,7 @@ class ChannelParser {
             target.apiDataQuality = "unavailable";
             target.unavailableReason = reason;
             target.unavailableType = ChannelParser.classifyUnavailable(reason);
+            target.unavailableCode = ChannelParser.unavailableCode(reason);
             return target;
         }
         let channelId, title, handle, description, avatar, subscriberCountText, videoCountText, tvBanner, mobileBanner, banner;
@@ -139,6 +141,20 @@ class ChannelParser {
             return "removed";
         }
         return "unavailable";
+    }
+    /** Map YouTube's English (hl=en) ERROR alert text to a stable code; first match wins. */
+    static unavailableCode(reason) {
+        const codes = [
+            ["not_found", /does not exist|closed their account/i],
+            ["linked_account", /has been terminated.*linked to an account/i],
+            ["copyright", /has been terminated.*copyright/i],
+            ["legal_claim", /has been terminated.*(trademark|counterfeit)/i],
+            ["google_terms", /has been terminated for violating google.s terms/i],
+            ["terms_of_service", /has been terminated/i],
+            ["community_guidelines", /was removed because/i],
+            ["not_available", /channel is not available/i],
+        ];
+        return codes.find(([, re]) => re.test(reason || ""))?.[0] || "unknown";
     }
     static parseShelves(target, data) {
         const shelves = [];

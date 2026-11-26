@@ -21,9 +21,11 @@ class BaseChannelParser {
     /** Parse tab data from request, tab name is ignored if it's a continuation data */
     static parseTabData(name, data) {
         const tab = data.contents?.twoColumnBrowseResultsRenderer.tabs.find((t) => {
-            return (t.tabRenderer?.endpoint.browseEndpoint.params ===
+            return (t.tabRenderer?.endpoint?.browseEndpoint.params ===
                 BaseChannelParser.TAB_TYPE_PARAMS[name]);
         });
+        if (tab?.tabRenderer.content?.sectionListRenderer?.contents?.[0]?.channelOwnerEmptyStateRenderer)
+            return [];
         return (tab?.tabRenderer.content.sectionListRenderer?.contents?.[0].itemSectionRenderer
             .contents[0].gridRenderer?.items ||
             tab?.tabRenderer.content?.sectionListRenderer?.contents?.[0].itemSectionRenderer
